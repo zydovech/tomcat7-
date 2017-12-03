@@ -182,8 +182,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      * themselves or other listeners and with a ReadWriteLock that would trigger
      * a deadlock.
      */
-    protected List<ContainerListener> listeners =
-            new CopyOnWriteArrayList<ContainerListener>();
+    protected List<ContainerListener> listeners = new CopyOnWriteArrayList<ContainerListener>();
 
     /**
      * The Loader implementation with which this Container is associated.

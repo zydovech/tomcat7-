@@ -973,6 +973,14 @@ public class Connector extends LifecycleMBeanBase  {
         }
 
         try {
+            //最后会
+            /*
+            *  1.协议初始化
+            *  2.调用AbstractProtocol的init方法
+            *  3.在AbstractProtocol的init方法中 会调用对应的endpoint的init方法
+            *  4.实际上调用的是AbstractEndpoint的init方法
+            *  5.最后调用实际的endpoint方法完成端口绑定
+            * */
             protocolHandler.init();
         } catch (Exception e) {
             throw new LifecycleException
