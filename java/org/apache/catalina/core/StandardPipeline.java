@@ -50,8 +50,7 @@ import org.apache.tomcat.util.ExceptionUtils;
  * @author Craig R. McClanahan
  */
 
-public class StandardPipeline extends LifecycleBase
-        implements Pipeline, Contained {
+public class StandardPipeline extends LifecycleBase implements Pipeline, Contained {
 
     private static final Log log = LogFactory.getLog(StandardPipeline.class);
 
@@ -86,7 +85,7 @@ public class StandardPipeline extends LifecycleBase
 
 
     /**
-     * The basic Valve (if any) associated with this Pipeline.
+     * The basic Valve (if any) associated with this Pipeline. 比如StandardWrapperValve
      */
     protected Valve basic = null;
 
