@@ -67,8 +67,7 @@ final class StandardHostValve extends ValveBase {
     static {
         STRICT_SERVLET_COMPLIANCE = Globals.STRICT_SERVLET_COMPLIANCE;
 
-        String accessSession = System.getProperty(
-                "org.apache.catalina.core.StandardHostValve.ACCESS_SESSION");
+        String accessSession = System.getProperty("org.apache.catalina.core.StandardHostValve.ACCESS_SESSION");
         if (accessSession == null) {
             ACCESS_SESSION = STRICT_SERVLET_COMPLIANCE;
         } else {
@@ -87,15 +86,13 @@ final class StandardHostValve extends ValveBase {
     /**
      * The descriptive information related to this implementation.
      */
-    private static final String info =
-        "org.apache.catalina.core.StandardHostValve/1.0";
+    private static final String info = "org.apache.catalina.core.StandardHostValve/1.0";
 
 
     /**
      * The string manager for this package.
      */
-    private static final StringManager sm =
-        StringManager.getManager(Constants.Package);
+    private static final StringManager sm = StringManager.getManager(Constants.Package);
 
 
     // ------------------------------------------------------------- Properties
@@ -133,9 +130,7 @@ final class StandardHostValve extends ValveBase {
         // Select the Context to be used for this Request
         Context context = request.getContext();
         if (context == null) {
-            response.sendError
-                (HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                 sm.getString("standardHost.noContext"));
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, sm.getString("standardHost.noContext"));
             return;
         }
 
@@ -144,12 +139,10 @@ final class StandardHostValve extends ValveBase {
             // Not started - it should check for availability first
             // This should eventually move to Engine, it's generic.
             if (Globals.IS_SECURITY_ENABLED) {
-                PrivilegedAction<Void> pa = new PrivilegedSetTccl(
-                        context.getLoader().getClassLoader());
+                PrivilegedAction<Void> pa = new PrivilegedSetTccl(context.getLoader().getClassLoader());
                 AccessController.doPrivileged(pa);
             } else {
-                Thread.currentThread().setContextClassLoader
-                        (context.getLoader().getClassLoader());
+                Thread.currentThread().setContextClassLoader(context.getLoader().getClassLoader());
             }
         }
         if (request.isAsyncSupported()) {
@@ -220,12 +213,10 @@ final class StandardHostValve extends ValveBase {
 
         // Restore the context classloader
         if (Globals.IS_SECURITY_ENABLED) {
-            PrivilegedAction<Void> pa = new PrivilegedSetTccl(
-                    StandardHostValve.class.getClassLoader());
+            PrivilegedAction<Void> pa = new PrivilegedSetTccl(StandardHostValve.class.getClassLoader());
             AccessController.doPrivileged(pa);
         } else {
-            Thread.currentThread().setContextClassLoader
-                    (StandardHostValve.class.getClassLoader());
+            Thread.currentThread().setContextClassLoader(StandardHostValve.class.getClassLoader());
         }
     }
 

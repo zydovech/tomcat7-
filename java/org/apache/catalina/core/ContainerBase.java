@@ -1000,9 +1000,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
         // Don't do this inside sync block - start can be a slow process and
         // locking the children object can cause problems elsewhere
         try {
-            if ((getState().isAvailable() ||
-                    LifecycleState.STARTING_PREP.equals(getState())) &&
-                    startChildren) {
+            if ((getState().isAvailable() || LifecycleState.STARTING_PREP.equals(getState())) && startChildren) {
                 child.start();
             }
         } catch (LifecycleException e) {
@@ -1102,7 +1100,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
     @Override
     public void invoke(Request request, Response response)
         throws IOException, ServletException {
-
+        //调用pipeline的方法
         pipeline.getFirst().invoke(request, response);
 
     }
@@ -1506,8 +1504,9 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
     @Override
     public void fireContainerEvent(String type, Object data) {
 
-        if (listeners.size() < 1)
+        if (listeners.size() < 1){
             return;
+        }
 
         ContainerEvent event = new ContainerEvent(this, type, data);
         // Note for each uses an iterator internally so this is safe
