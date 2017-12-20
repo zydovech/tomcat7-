@@ -80,8 +80,7 @@ import org.apache.tomcat.util.modeler.Util;
  * @author Remy Maucherat
  */
 @SuppressWarnings("deprecation") // SingleThreadModel
-public class StandardWrapper extends ContainerBase
-    implements ServletConfig, Wrapper, NotificationEmitter {
+public class StandardWrapper extends ContainerBase implements ServletConfig, Wrapper, NotificationEmitter {
 
     private static final Log log = LogFactory.getLog( StandardWrapper.class );
 
@@ -1105,13 +1104,13 @@ public class StandardWrapper extends ContainerBase
     public synchronized Servlet loadServlet() throws ServletException {
 
         if (unloading) {
-            throw new ServletException(
-                    sm.getString("standardWrapper.unloading", getName()));
+            throw new ServletException(sm.getString("standardWrapper.unloading", getName()));
         }
 
         // Nothing to do if we already have an instance or an instance pool
-        if (!singleThreadModel && (instance != null))
+        if (!singleThreadModel && (instance != null)){
             return instance;
+        }
 
         PrintStream out = System.out;
         if (swallowOutput) {
@@ -1124,8 +1123,7 @@ public class StandardWrapper extends ContainerBase
             // Complain if no servlet class has been specified
             if (servletClass == null) {
                 unavailable(null);
-                throw new ServletException
-                    (sm.getString("standardWrapper.notClass", getName()));
+                throw new ServletException(sm.getString("standardWrapper.notClass", getName()));
             }
 
             InstanceManager instanceManager = ((StandardContext)getParent()).getInstanceManager();
@@ -1134,8 +1132,7 @@ public class StandardWrapper extends ContainerBase
             } catch (ClassCastException e) {
                 unavailable(null);
                 // Restore the context ClassLoader
-                throw new ServletException
-                    (sm.getString("standardWrapper.notServlet", servletClass), e);
+                throw new ServletException(sm.getString("standardWrapper.notServlet", servletClass), e);
             } catch (Throwable e) {
                 e = ExceptionUtils.unwrapInvocationTargetException(e);
                 ExceptionUtils.handleThrowable(e);
@@ -1153,11 +1150,9 @@ public class StandardWrapper extends ContainerBase
             }
 
             if (multipartConfigElement == null) {
-                MultipartConfig annotation =
-                        servlet.getClass().getAnnotation(MultipartConfig.class);
+                MultipartConfig annotation = servlet.getClass().getAnnotation(MultipartConfig.class);
                 if (annotation != null) {
-                    multipartConfigElement =
-                            new MultipartConfigElement(annotation);
+                    multipartConfigElement = new MultipartConfigElement(annotation);
                 }
             }
 
@@ -1254,10 +1249,7 @@ public class StandardWrapper extends ContainerBase
                 boolean success = false;
                 try {
                     Object[] args = new Object[] { facade };
-                    SecurityUtil.doAsPrivilege("init",
-                                               servlet,
-                                               classType,
-                                               args);
+                    SecurityUtil.doAsPrivilege("init", servlet, classType, args);
                     success = true;
                 } finally {
                     if (!success) {

@@ -80,8 +80,7 @@ import org.apache.tomcat.util.modeler.Util;
  * @author Remy Maucherat
  */
 @SuppressWarnings("deprecation") // SingleThreadModel
-public class StandardWrapper extends ContainerBase
-    implements ServletConfig, Wrapper, NotificationEmitter {
+public class StandardWrapper extends ContainerBase implements ServletConfig, Wrapper, NotificationEmitter {
 
     private static final Log log = LogFactory.getLog( StandardWrapper.class );
 

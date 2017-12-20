@@ -58,11 +58,9 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
 
     private static final long serialVersionUID = 1L;
 
-    static final StringManager sm =
-        StringManager.getManager(Constants.Package);
+    static final StringManager sm = StringManager.getManager(Constants.Package);
 
-    private static final org.apache.juli.logging.Log log =
-        LogFactory.getLog(ApplicationFilterConfig.class);
+    private static final org.apache.juli.logging.Log log = LogFactory.getLog(ApplicationFilterConfig.class);
 
     /**
      * Empty String collection to serve as the basis for empty enumerations.

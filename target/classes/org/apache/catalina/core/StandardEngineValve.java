@@ -41,8 +41,7 @@ import org.apache.tomcat.util.res.StringManager;
  *
  * @author Craig R. McClanahan
  */
-final class StandardEngineValve
-    extends ValveBase {
+final class StandardEngineValve extends ValveBase {
 
     //------------------------------------------------------ Constructor
     public StandardEngineValve() {
@@ -56,15 +55,13 @@ final class StandardEngineValve
     /**
      * The descriptive information related to this implementation.
      */
-    private static final String info =
-        "org.apache.catalina.core.StandardEngineValve/1.0";
+    private static final String info = "org.apache.catalina.core.StandardEngineValve/1.0";
 
 
     /**
      * The string manager for this package.
      */
-    private static final StringManager sm =
-        StringManager.getManager(Constants.Package);
+    private static final StringManager sm = StringManager.getManager(Constants.Package);
 
 
     // ------------------------------------------------------------- Properties
@@ -96,16 +93,12 @@ final class StandardEngineValve
      * @exception ServletException if a servlet error occurred
      */
     @Override
-    public final void invoke(Request request, Response response)
-        throws IOException, ServletException {
+    public final void invoke(Request request, Response response) throws IOException, ServletException {
 
         // Select the Host to be used for this Request
         Host host = request.getHost();
         if (host == null) {
-            response.sendError
-                (HttpServletResponse.SC_BAD_REQUEST,
-                 sm.getString("standardEngine.noHost", 
-                              request.getServerName()));
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, sm.getString("standardEngine.noHost", request.getServerName()));
             return;
         }
         if (request.isAsyncSupported()) {
@@ -113,6 +106,7 @@ final class StandardEngineValve
         }
 
         // Ask this Host to process this request
+        //StandardEngineValve 是Engine的basic Valve。。在最后的时候会获取Host的Pipeline 的valve链表。来进行调用
         host.getPipeline().getFirst().invoke(request, response);
 
     }

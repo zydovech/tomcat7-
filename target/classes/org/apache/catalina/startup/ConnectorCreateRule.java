@@ -50,6 +50,8 @@ public class ConnectorCreateRule extends Rule {
      * @param name the local name if the parser is namespace aware, or just 
      *   the element name otherwise
      * @param attributes The attribute list for this element
+     *
+     * 创建Connector的实例
      */
     @Override
     public void begin(String namespace, String name, Attributes attributes)
@@ -84,6 +86,8 @@ public class ConnectorCreateRule extends Rule {
      *   no namespace
      * @param name the local name if the parser is namespace aware, or just 
      *   the element name otherwise
+     *
+     *  遇到</Connector>时候 从digester中弹出当前对象
      */
     @Override
     public void end(String namespace, String name) throws Exception {

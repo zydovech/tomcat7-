@@ -93,8 +93,7 @@ final class ApplicationFilterChain implements FilterChain, CometFilterChain {
     /**
      * Filters.
      */
-    private ApplicationFilterConfig[] filters = 
-        new ApplicationFilterConfig[0];
+    private ApplicationFilterConfig[] filters = new ApplicationFilterConfig[0];
 
 
     /**
@@ -215,57 +214,53 @@ final class ApplicationFilterChain implements FilterChain, CometFilterChain {
 
         // Call the next filter if there is one
         if (pos < n) {
+            //这个地方每次都会对pos的位置增加1 直到过滤器链中所有的过滤器都已经执行
             ApplicationFilterConfig filterConfig = filters[pos++];
             Filter filter = null;
             try {
                 filter = filterConfig.getFilter();
-                support.fireInstanceEvent(InstanceEvent.BEFORE_FILTER_EVENT,
-                                          filter, request, response);
+                support.fireInstanceEvent(InstanceEvent.BEFORE_FILTER_EVENT, filter, request, response);
                 
                 if (request.isAsyncSupported() && "false".equalsIgnoreCase(
                         filterConfig.getFilterDef().getAsyncSupported())) {
-                    request.setAttribute(Globals.ASYNC_SUPPORTED_ATTR,
-                            Boolean.FALSE);
+                    request.setAttribute(Globals.ASYNC_SUPPORTED_ATTR, Boolean.FALSE);
                 }
                 if( Globals.IS_SECURITY_ENABLED ) {
                     final ServletRequest req = request;
                     final ServletResponse res = response;
-                    Principal principal = 
-                        ((HttpServletRequest) req).getUserPrincipal();
+                    Principal principal = ((HttpServletRequest) req).getUserPrincipal();
 
                     Object[] args = new Object[]{req, res, this};
-                    SecurityUtil.doAsPrivilege
-                        ("doFilter", filter, classType, args, principal);
+                    SecurityUtil.doAsPrivilege("doFilter", filter, classType, args, principal);
                     
-                } else {  
+                } else {
+                    //这里开始调用Filter 的方法进行处理。。在doFilter内部会继续调用chain的doFilter 沿着过滤器链一直执行
                     filter.doFilter(request, response, this);
                 }
 
-                support.fireInstanceEvent(InstanceEvent.AFTER_FILTER_EVENT,
-                                          filter, request, response);
+                support.fireInstanceEvent(InstanceEvent.AFTER_FILTER_EVENT, filter, request, response);
             } catch (IOException e) {
-                if (filter != null)
-                    support.fireInstanceEvent(InstanceEvent.AFTER_FILTER_EVENT,
-                                              filter, request, response, e);
+                if (filter != null){
+                    support.fireInstanceEvent(InstanceEvent.AFTER_FILTER_EVENT, filter, request, response, e);
+                }
                 throw e;
             } catch (ServletException e) {
-                if (filter != null)
-                    support.fireInstanceEvent(InstanceEvent.AFTER_FILTER_EVENT,
-                                              filter, request, response, e);
+                if (filter != null){
+                    support.fireInstanceEvent(InstanceEvent.AFTER_FILTER_EVENT,filter, request, response, e);
+                }
                 throw e;
             } catch (RuntimeException e) {
-                if (filter != null)
-                    support.fireInstanceEvent(InstanceEvent.AFTER_FILTER_EVENT,
-                                              filter, request, response, e);
+                if (filter != null){
+                    support.fireInstanceEvent(InstanceEvent.AFTER_FILTER_EVENT, filter, request, response, e);
+                }
                 throw e;
             } catch (Throwable e) {
                 e = ExceptionUtils.unwrapInvocationTargetException(e);
                 ExceptionUtils.handleThrowable(e);
-                if (filter != null)
-                    support.fireInstanceEvent(InstanceEvent.AFTER_FILTER_EVENT,
-                                              filter, request, response, e);
-                throw new ServletException
-                  (sm.getString("filterChain.filter"), e);
+                if (filter != null){
+                    support.fireInstanceEvent(InstanceEvent.AFTER_FILTER_EVENT, filter, request, response, e);
+                }
+                throw new ServletException(sm.getString("filterChain.filter"), e);
             }
             return;
         }
@@ -277,12 +272,10 @@ final class ApplicationFilterChain implements FilterChain, CometFilterChain {
                 lastServicedResponse.set(response);
             }
 
-            support.fireInstanceEvent(InstanceEvent.BEFORE_SERVICE_EVENT,
-                                      servlet, request, response);
+            support.fireInstanceEvent(InstanceEvent.BEFORE_SERVICE_EVENT, servlet, request, response);
             if (request.isAsyncSupported()
                     && !support.getWrapper().isAsyncSupported()) {
-                request.setAttribute(Globals.ASYNC_SUPPORTED_ATTR,
-                        Boolean.FALSE);
+                request.setAttribute(Globals.ASYNC_SUPPORTED_ATTR, Boolean.FALSE);
             }
             // Use potentially wrapped request from this point
             if ((request instanceof HttpServletRequest) &&
@@ -299,32 +292,27 @@ final class ApplicationFilterChain implements FilterChain, CometFilterChain {
                                                classTypeUsedInService, 
                                                args,
                                                principal);   
-                } else {  
+                } else {
+                    //调用servlet的service方法进行处理
                     servlet.service(request, response);
                 }
             } else {
                 servlet.service(request, response);
             }
-            support.fireInstanceEvent(InstanceEvent.AFTER_SERVICE_EVENT,
-                                      servlet, request, response);
+            support.fireInstanceEvent(InstanceEvent.AFTER_SERVICE_EVENT, servlet, request, response);
         } catch (IOException e) {
-            support.fireInstanceEvent(InstanceEvent.AFTER_SERVICE_EVENT,
-                                      servlet, request, response, e);
+            support.fireInstanceEvent(InstanceEvent.AFTER_SERVICE_EVENT, servlet, request, response);
             throw e;
         } catch (ServletException e) {
-            support.fireInstanceEvent(InstanceEvent.AFTER_SERVICE_EVENT,
-                                      servlet, request, response, e);
+            support.fireInstanceEvent(InstanceEvent.AFTER_SERVICE_EVENT, servlet, request, response);
             throw e;
         } catch (RuntimeException e) {
-            support.fireInstanceEvent(InstanceEvent.AFTER_SERVICE_EVENT,
-                                      servlet, request, response, e);
+            support.fireInstanceEvent(InstanceEvent.AFTER_SERVICE_EVENT, servlet, request, response);
             throw e;
         } catch (Throwable e) {
             ExceptionUtils.handleThrowable(e);
-            support.fireInstanceEvent(InstanceEvent.AFTER_SERVICE_EVENT,
-                                      servlet, request, response, e);
-            throw new ServletException
-              (sm.getString("filterChain.servlet"), e);
+            support.fireInstanceEvent(InstanceEvent.AFTER_SERVICE_EVENT, servlet, request, response);
+            throw new ServletException(sm.getString("filterChain.servlet"), e);
         } finally {
             if (ApplicationDispatcher.WRAP_SAME_OBJECT) {
                 lastServicedRequest.set(null);

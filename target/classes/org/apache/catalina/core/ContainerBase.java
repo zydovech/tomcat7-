@@ -130,11 +130,9 @@ import org.apache.tomcat.util.res.StringManager;
  *
  * @author Craig R. McClanahan
  */
-public abstract class ContainerBase extends LifecycleMBeanBase
-        implements Container {
+public abstract class ContainerBase extends LifecycleMBeanBase implements Container {
 
-    private static final org.apache.juli.logging.Log log=
-        org.apache.juli.logging.LogFactory.getLog( ContainerBase.class );
+    private static final org.apache.juli.logging.Log log= org.apache.juli.logging.LogFactory.getLog( ContainerBase.class );
 
     /**
      * Perform addChild with the permissions of this class.
@@ -166,8 +164,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
     /**
      * The child Containers belonging to this Container, keyed by name.
      */
-    protected HashMap<String, Container> children =
-        new HashMap<String, Container>();
+    protected HashMap<String, Container> children = new HashMap<String, Container>();
 
 
     /**
@@ -182,8 +179,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      * themselves or other listeners and with a ReadWriteLock that would trigger
      * a deadlock.
      */
-    protected List<ContainerListener> listeners =
-            new CopyOnWriteArrayList<ContainerListener>();
+    protected List<ContainerListener> listeners = new CopyOnWriteArrayList<ContainerListener>();
 
     /**
      * The Loader implementation with which this Container is associated.
@@ -263,8 +259,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
     /**
      * The string manager for this package.
      */
-    protected static final StringManager sm =
-        StringManager.getManager(Constants.Package);
+    protected static final StringManager sm = StringManager.getManager(Constants.Package);
 
 
     /**
@@ -441,8 +436,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
             this.loader = loader;
 
             // Stop the old component if necessary
-            if (getState().isAvailable() && (oldLoader != null) &&
-                    (oldLoader instanceof Lifecycle)) {
+            if (getState().isAvailable() && (oldLoader != null) && (oldLoader instanceof Lifecycle)) {
                 try {
                     ((Lifecycle) oldLoader).stop();
                 } catch (LifecycleException e) {
@@ -453,8 +447,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
             // Start the new component if necessary
             if (loader != null)
                 loader.setContainer(this);
-            if (getState().isAvailable() && (loader != null) &&
-                    (loader instanceof Lifecycle)) {
+            if (getState().isAvailable() && (loader != null) && (loader instanceof Lifecycle)) {
                 try {
                     ((Lifecycle) loader).start();
                 } catch (LifecycleException e) {
@@ -984,8 +977,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
     @Override
     public void addChild(Container child) {
         if (Globals.IS_SECURITY_ENABLED) {
-            PrivilegedAction<Void> dp =
-                new PrivilegedAddChild(child);
+            PrivilegedAction<Void> dp = new PrivilegedAddChild(child);
             AccessController.doPrivileged(dp);
         } else {
             addChildInternal(child);
@@ -994,13 +986,12 @@ public abstract class ContainerBase extends LifecycleMBeanBase
 
     private void addChildInternal(Container child) {
 
-        if( log.isDebugEnabled() )
-            log.debug("Add child " + child + " " + this);
+
+        log.info("Add child " + child + " " + this);
         synchronized(children) {
-            if (children.get(child.getName()) != null)
-                throw new IllegalArgumentException("addChild:  Child name '" +
-                                                   child.getName() +
-                                                   "' is not unique");
+            if (children.get(child.getName()) != null){
+                throw new IllegalArgumentException("addChild:  Child name '" +child.getName() + "' is not unique");
+            }
             child.setParent(this);  // May throw IAE
             children.put(child.getName(), child);
         }
@@ -1009,9 +1000,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         // Don't do this inside sync block - start can be a slow process and
         // locking the children object can cause problems elsewhere
         try {
-            if ((getState().isAvailable() ||
-                    LifecycleState.STARTING_PREP.equals(getState())) &&
-                    startChildren) {
+            if ((getState().isAvailable() || LifecycleState.STARTING_PREP.equals(getState())) && startChildren) {
                 child.start();
             }
         } catch (LifecycleException e) {
@@ -1111,7 +1100,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
     @Override
     public void invoke(Request request, Response response)
         throws IOException, ServletException {
-
+        //调用pipeline的方法
         pipeline.getFirst().invoke(request, response);
 
     }
@@ -1185,11 +1174,8 @@ public abstract class ContainerBase extends LifecycleMBeanBase
 
     @Override
     protected void initInternal() throws LifecycleException {
-        BlockingQueue<Runnable> startStopQueue =
-            new LinkedBlockingQueue<Runnable>();
-        startStopExecutor = new ThreadPoolExecutor(
-                getStartStopThreadsInternal(),
-                getStartStopThreadsInternal(), 10, TimeUnit.SECONDS,
+        BlockingQueue<Runnable> startStopQueue = new LinkedBlockingQueue<Runnable>();
+        startStopExecutor = new ThreadPoolExecutor(getStartStopThreadsInternal(), getStartStopThreadsInternal(), 10, TimeUnit.SECONDS,
                 startStopQueue,
                 new StartStopThreadFactory(getName() + "-startStop-"));
         startStopExecutor.allowCoreThreadTimeOut(true);
@@ -1515,8 +1501,9 @@ public abstract class ContainerBase extends LifecycleMBeanBase
     @Override
     public void fireContainerEvent(String type, Object data) {
 
-        if (listeners.size() < 1)
+        if (listeners.size() < 1){
             return;
+        }
 
         ContainerEvent event = new ContainerEvent(this, type, data);
         // Note for each uses an iterator internally so this is safe

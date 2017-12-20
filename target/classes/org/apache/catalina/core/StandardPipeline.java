@@ -50,8 +50,7 @@ import org.apache.tomcat.util.ExceptionUtils;
  * @author Craig R. McClanahan
  */
 
-public class StandardPipeline extends LifecycleBase
-        implements Pipeline, Contained {
+public class StandardPipeline extends LifecycleBase implements Pipeline, Contained {
 
     private static final Log log = LogFactory.getLog(StandardPipeline.class);
 
@@ -71,6 +70,7 @@ public class StandardPipeline extends LifecycleBase
     /**
      * Construct a new StandardPipeline instance that is associated with the
      * specified Container.
+     * 每个Container都包含有StandardPipeline
      *
      * @param container The container we should be associated with
      */
@@ -87,12 +87,14 @@ public class StandardPipeline extends LifecycleBase
 
     /**
      * The basic Valve (if any) associated with this Pipeline.
+     * 比如StandardWrapperValve basic的Valve 在链表的尾部
      */
     protected Valve basic = null;
 
 
     /**
      * The Container with which this Pipeline is associated.
+     * 和改Pipeline 关联的容器
      */
     protected Container container = null;
 
@@ -105,6 +107,7 @@ public class StandardPipeline extends LifecycleBase
 
     /**
      * The first valve associated with this Pipeline.
+     * Valve链表的头部
      */
     protected Valve first = null;
     
@@ -180,9 +183,11 @@ public class StandardPipeline extends LifecycleBase
         if (current == null) {
             current = basic;
         }
+        //如果Valve实现了Lifecycle 则循环调用所有的Valve 不然不调用
         while (current != null) {
-            if (current instanceof Lifecycle)
+            if (current instanceof Lifecycle){
                 ((Lifecycle) current).start();
+            }
             current = current.getNext();
         }
 
@@ -208,8 +213,9 @@ public class StandardPipeline extends LifecycleBase
             current = basic;
         }
         while (current != null) {
-            if (current instanceof Lifecycle)
+            if (current instanceof Lifecycle){
                 ((Lifecycle) current).stop();
+            }
             current = current.getNext();
         }
     }
@@ -268,8 +274,9 @@ public class StandardPipeline extends LifecycleBase
 
         // Change components if necessary
         Valve oldBasic = this.basic;
-        if (oldBasic == valve)
+        if (oldBasic == valve){
             return;
+        }
 
         // Stop the old component if necessary
         if (oldBasic != null) {
@@ -290,8 +297,9 @@ public class StandardPipeline extends LifecycleBase
         }
 
         // Start the new component if necessary
-        if (valve == null)
+        if (valve == null){
             return;
+        }
         if (valve instanceof Contained) {
             ((Contained) valve).setContainer(this.container);
         }
@@ -342,8 +350,9 @@ public class StandardPipeline extends LifecycleBase
     public void addValve(Valve valve) {
     
         // Validate that we can add this Valve
-        if (valve instanceof Contained)
+        if (valve instanceof Contained){
             ((Contained) valve).setContainer(this.container);
+        }
 
         // Start the new component if necessary
         if (getState().isAvailable()) {
@@ -371,7 +380,7 @@ public class StandardPipeline extends LifecycleBase
                 current = current.getNext();
             }
         }
-        
+        //启动ADD_VALVE_EVENT事件
         container.fireContainerEvent(Container.ADD_VALVE_EVENT, valve);
     }
 
@@ -442,7 +451,9 @@ public class StandardPipeline extends LifecycleBase
             current = current.getNext();
         }
 
-        if (first == basic) first = null;
+        if (first == basic){
+            first = null;
+        }
 
         if (valve instanceof Contained)
             ((Contained) valve).setContainer(null);

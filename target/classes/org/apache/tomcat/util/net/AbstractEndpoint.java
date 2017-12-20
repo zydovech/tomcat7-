@@ -725,6 +725,7 @@ public abstract class AbstractEndpoint<S> {
     public final void init() throws Exception {
         testServerCipherSuitesOrderSupport();
         if (bindOnInit) {
+            //调用bind方法完成 端口绑定
             bind();
             bindState = BindState.BOUND_ON_INIT;
         }

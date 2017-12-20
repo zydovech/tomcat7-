@@ -143,8 +143,7 @@ import org.apache.tomcat.util.scan.StandardJarScanner;
  * @author Craig R. McClanahan
  * @author Remy Maucherat
  */
-public class StandardContext extends ContainerBase
-        implements Context, NotificationEmitter {
+public class StandardContext extends ContainerBase implements Context, NotificationEmitter {
 
     private static final Log log = LogFactory.getLog(StandardContext.class);
 

@@ -1174,11 +1174,8 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
 
     @Override
     protected void initInternal() throws LifecycleException {
-        BlockingQueue<Runnable> startStopQueue =
-            new LinkedBlockingQueue<Runnable>();
-        startStopExecutor = new ThreadPoolExecutor(
-                getStartStopThreadsInternal(),
-                getStartStopThreadsInternal(), 10, TimeUnit.SECONDS,
+        BlockingQueue<Runnable> startStopQueue = new LinkedBlockingQueue<Runnable>();
+        startStopExecutor = new ThreadPoolExecutor(getStartStopThreadsInternal(), getStartStopThreadsInternal(), 10, TimeUnit.SECONDS,
                 startStopQueue,
                 new StartStopThreadFactory(getName() + "-startStop-"));
         startStopExecutor.allowCoreThreadTimeOut(true);

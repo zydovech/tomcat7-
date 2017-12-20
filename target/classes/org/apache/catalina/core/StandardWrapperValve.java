@@ -91,8 +91,7 @@ final class StandardWrapperValve
      * @exception ServletException if a servlet error occurred
      */
     @Override
-    public final void invoke(Request request, Response response)
-        throws IOException, ServletException {
+    public final void invoke(Request request, Response response) throws IOException, ServletException {
 
         // Initialize local variables we may need
         boolean unavailable = false;
@@ -106,25 +105,19 @@ final class StandardWrapperValve
 
         // Check for the application being marked unavailable
         if (!context.getState().isAvailable()) {
-            response.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE,
-                           sm.getString("standardContext.isUnavailable"));
+            response.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE, sm.getString("standardContext.isUnavailable"));
             unavailable = true;
         }
 
         // Check for the servlet being marked unavailable
         if (!unavailable && wrapper.isUnavailable()) {
-            container.getLogger().info(sm.getString("standardWrapper.isUnavailable",
-                    wrapper.getName()));
+            container.getLogger().info(sm.getString("standardWrapper.isUnavailable", wrapper.getName()));
             long available = wrapper.getAvailable();
             if ((available > 0L) && (available < Long.MAX_VALUE)) {
                 response.setDateHeader("Retry-After", available);
-                response.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE,
-                        sm.getString("standardWrapper.isUnavailable",
-                                wrapper.getName()));
+                response.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE, sm.getString("standardWrapper.isUnavailable", wrapper.getName()));
             } else if (available == Long.MAX_VALUE) {
-                response.sendError(HttpServletResponse.SC_NOT_FOUND,
-                        sm.getString("standardWrapper.notFound",
-                                wrapper.getName()));
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, sm.getString("standardWrapper.notFound",wrapper.getName()));
             }
             unavailable = true;
         }
@@ -135,29 +128,21 @@ final class StandardWrapperValve
                 servlet = wrapper.allocate();
             }
         } catch (UnavailableException e) {
-            container.getLogger().error(
-                    sm.getString("standardWrapper.allocateException",
-                            wrapper.getName()), e);
+            container.getLogger().error(sm.getString("standardWrapper.allocateException", wrapper.getName()), e);
             long available = wrapper.getAvailable();
             if ((available > 0L) && (available < Long.MAX_VALUE)) {
                 response.setDateHeader("Retry-After", available);
-                response.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE,
-                           sm.getString("standardWrapper.isUnavailable",
-                                        wrapper.getName()));
+                response.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE, sm.getString("standardWrapper.isUnavailable", wrapper.getName()));
             } else if (available == Long.MAX_VALUE) {
-                response.sendError(HttpServletResponse.SC_NOT_FOUND,
-                           sm.getString("standardWrapper.notFound",
-                                        wrapper.getName()));
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, sm.getString("standardWrapper.notFound", wrapper.getName()));
             }
         } catch (ServletException e) {
-            container.getLogger().error(sm.getString("standardWrapper.allocateException",
-                             wrapper.getName()), StandardWrapper.getRootCause(e));
+            container.getLogger().error(sm.getString("standardWrapper.allocateException", wrapper.getName()), StandardWrapper.getRootCause(e));
             throwable = e;
             exception(request, response, e);
         } catch (Throwable e) {
             ExceptionUtils.handleThrowable(e);
-            container.getLogger().error(sm.getString("standardWrapper.allocateException",
-                             wrapper.getName()), e);
+            container.getLogger().error(sm.getString("standardWrapper.allocateException", wrapper.getName()), e);
             throwable = e;
             exception(request, response, e);
             servlet = null;
@@ -165,23 +150,21 @@ final class StandardWrapperValve
 
         // Identify if the request is Comet related now that the servlet has been allocated
         boolean comet = false;
-        if (servlet instanceof CometProcessor && Boolean.TRUE.equals(request.getAttribute(
-                Globals.COMET_SUPPORTED_ATTR))) {
+        if (servlet instanceof CometProcessor && Boolean.TRUE.equals(request.getAttribute(Globals.COMET_SUPPORTED_ATTR))) {
             comet = true;
             request.setComet(true);
         }
 
         MessageBytes requestPathMB = request.getRequestPathMB();
         DispatcherType dispatcherType = DispatcherType.REQUEST;
-        if (request.getDispatcherType()==DispatcherType.ASYNC) dispatcherType = DispatcherType.ASYNC;
+        if (request.getDispatcherType()==DispatcherType.ASYNC) {
+            dispatcherType = DispatcherType.ASYNC;
+        }
         request.setAttribute(Globals.DISPATCHER_TYPE_ATTR,dispatcherType);
-        request.setAttribute(Globals.DISPATCHER_REQUEST_PATH_ATTR,
-                requestPathMB);
+        request.setAttribute(Globals.DISPATCHER_REQUEST_PATH_ATTR, requestPathMB);
         // Create the filter chain for this request
-        ApplicationFilterFactory factory =
-            ApplicationFilterFactory.getInstance();
-        ApplicationFilterChain filterChain =
-            factory.createFilterChain(request, wrapper, servlet);
+        ApplicationFilterFactory factory = ApplicationFilterFactory.getInstance();
+        ApplicationFilterChain filterChain = factory.createFilterChain(request, wrapper, servlet);
 
         // Reset comet flag value after creating the filter chain
         request.setComet(false);
@@ -200,8 +183,7 @@ final class StandardWrapperValve
                             filterChain.doFilterEvent(request.getEvent());
                             request.setComet(true);
                         } else {
-                            filterChain.doFilter(request.getRequest(),
-                                    response.getResponse());
+                            filterChain.doFilter(request.getRequest(), response.getResponse());
                         }
                     } finally {
                         String log = SystemLogHandler.stopCapture();
@@ -216,8 +198,7 @@ final class StandardWrapperValve
                         request.setComet(true);
                         filterChain.doFilterEvent(request.getEvent());
                     } else {
-                        filterChain.doFilter
-                            (request.getRequest(), response.getResponse());
+                        filterChain.doFilter(request.getRequest(), response.getResponse());
                     }
                 }
 
@@ -227,37 +208,28 @@ final class StandardWrapperValve
             exception(request, response, e);
         } catch (IOException e) {
             container.getLogger().error(sm.getString(
-                    "standardWrapper.serviceException", wrapper.getName(),
-                    context.getName()), e);
+                    "standardWrapper.serviceException", wrapper.getName(), context.getName()), e);
             throwable = e;
             exception(request, response, e);
         } catch (UnavailableException e) {
             container.getLogger().error(sm.getString(
-                    "standardWrapper.serviceException", wrapper.getName(),
-                    context.getName()), e);
+                    "standardWrapper.serviceException", wrapper.getName(), context.getName()), e);
             //            throwable = e;
             //            exception(request, response, e);
             wrapper.unavailable(e);
             long available = wrapper.getAvailable();
             if ((available > 0L) && (available < Long.MAX_VALUE)) {
                 response.setDateHeader("Retry-After", available);
-                response.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE,
-                           sm.getString("standardWrapper.isUnavailable",
-                                        wrapper.getName()));
+                response.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE, sm.getString("standardWrapper.isUnavailable", wrapper.getName()));
             } else if (available == Long.MAX_VALUE) {
-                response.sendError(HttpServletResponse.SC_NOT_FOUND,
-                            sm.getString("standardWrapper.notFound",
-                                        wrapper.getName()));
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, sm.getString("standardWrapper.notFound", wrapper.getName()));
             }
             // Do not save exception in 'throwable', because we
             // do not want to do exception(request, response, e) processing
         } catch (ServletException e) {
             Throwable rootCause = StandardWrapper.getRootCause(e);
             if (!(rootCause instanceof ClientAbortException)) {
-                container.getLogger().error(sm.getString(
-                        "standardWrapper.serviceExceptionRoot",
-                        wrapper.getName(), context.getName(), e.getMessage()),
-                        rootCause);
+                container.getLogger().error(sm.getString("standardWrapper.serviceExceptionRoot", wrapper.getName(), context.getName(), e.getMessage()), rootCause);
             }
             throwable = e;
             exception(request, response, e);
@@ -288,8 +260,7 @@ final class StandardWrapperValve
             }
         } catch (Throwable e) {
             ExceptionUtils.handleThrowable(e);
-            container.getLogger().error(sm.getString("standardWrapper.deallocateException",
-                             wrapper.getName()), e);
+            container.getLogger().error(sm.getString("standardWrapper.deallocateException", wrapper.getName()), e);
             if (throwable == null) {
                 throwable = e;
                 exception(request, response, e);
@@ -305,8 +276,7 @@ final class StandardWrapperValve
             }
         } catch (Throwable e) {
             ExceptionUtils.handleThrowable(e);
-            container.getLogger().error(sm.getString("standardWrapper.unloadException",
-                             wrapper.getName()), e);
+            container.getLogger().error(sm.getString("standardWrapper.unloadException", wrapper.getName()), e);
             if (throwable == null) {
                 throwable = e;
                 exception(request, response, e);

@@ -42,8 +42,7 @@ import org.apache.tomcat.util.net.SocketWrapper;
 public class Http11Protocol extends AbstractHttp11JsseProtocol<Socket> {
 
 
-    private static final org.apache.juli.logging.Log log
-        = org.apache.juli.logging.LogFactory.getLog(Http11Protocol.class);
+    private static final org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog(Http11Protocol.class);
     
     @Override
     protected Log getLog() { return log; }
@@ -100,8 +99,7 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol<Socket> {
 
     // -----------------------------------  Http11ConnectionHandler Inner Class
 
-    protected static class Http11ConnectionHandler
-            extends AbstractConnectionHandler<Socket, Http11Processor> implements Handler {
+    protected static class Http11ConnectionHandler extends AbstractConnectionHandler<Socket, Http11Processor> implements Handler {
 
         protected Http11Protocol proto;
             
@@ -134,9 +132,7 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol<Socket> {
          * @param addToPoller       Not used in BIO
          */
         @Override
-        public void release(SocketWrapper<Socket> socket,
-                Processor<Socket> processor, boolean isSocketClosing,
-                boolean addToPoller) {
+        public void release(SocketWrapper<Socket> socket, Processor<Socket> processor, boolean isSocketClosing, boolean addToPoller) {
             processor.recycle(isSocketClosing);
             recycledProcessors.offer(processor);
         }
@@ -145,9 +141,7 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol<Socket> {
         protected void initSsl(SocketWrapper<Socket> socket,
                 Processor<Socket> processor) {
             if (proto.isSSLEnabled() && (proto.sslImplementation != null)) {
-                processor.setSslSupport(
-                        proto.sslImplementation.getSSLSupport(
-                                socket.getSocket()));
+                processor.setSslSupport(proto.sslImplementation.getSSLSupport(socket.getSocket()));
             } else {
                 processor.setSslSupport(null);
             }
@@ -162,9 +156,7 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol<Socket> {
 
         @Override
         protected Http11Processor createProcessor() {
-            Http11Processor processor = new Http11Processor(
-                    proto.getMaxHttpHeaderSize(), proto.getRejectIllegalHeaderName(),
-                    (JIoEndpoint)proto.endpoint, proto.getMaxTrailerSize(),
+            Http11Processor processor = new Http11Processor(proto.getMaxHttpHeaderSize(), proto.getRejectIllegalHeaderName(), (JIoEndpoint)proto.endpoint, proto.getMaxTrailerSize(),
                     proto.getAllowedTrailerHeadersAsSet(), proto.getMaxExtensionSize(),
                     proto.getMaxSwallowSize());
             processor.setAdapter(proto.adapter);

@@ -76,8 +76,7 @@ public class Connector extends LifecycleMBeanBase  {
             Class<?> clazz = Class.forName(protocolHandlerClassName);
             this.protocolHandler = (ProtocolHandler) clazz.newInstance();
         } catch (Exception e) {
-            log.error(sm.getString(
-                    "coyoteConnector.protocolHandlerInstantiationFailed"), e);
+            log.error(sm.getString("coyoteConnector.protocolHandlerInstantiationFailed"), e);
         }
     }
 
@@ -969,14 +968,19 @@ public class Connector extends LifecycleMBeanBase  {
             setParseBodyMethods(getParseBodyMethods());
         }
 
-        if (protocolHandler.isAprRequired() &&
-                !AprLifecycleListener.isAprAvailable()) {
-            throw new LifecycleException(
-                    sm.getString("coyoteConnector.protocolHandlerNoApr",
-                            getProtocolHandlerClassName()));
+        if (protocolHandler.isAprRequired() && !AprLifecycleListener.isAprAvailable()) {
+            throw new LifecycleException(sm.getString("coyoteConnector.protocolHandlerNoApr", getProtocolHandlerClassName()));
         }
 
         try {
+            //最后会
+            /*
+            *  1.协议初始化
+            *  2.调用AbstractProtocol的init方法
+            *  3.在AbstractProtocol的init方法中 会调用对应的endpoint的init方法
+            *  4.实际上调用的是AbstractEndpoint的init方法
+            *  5.最后调用实际的endpoint方法完成端口绑定
+            * */
             protocolHandler.init();
         } catch (Exception e) {
             throw new LifecycleException
@@ -999,8 +1003,7 @@ public class Connector extends LifecycleMBeanBase  {
 
         // Validate settings before starting
         if (getPort() < 0) {
-            throw new LifecycleException(sm.getString(
-                    "coyoteConnector.invalidPort", Integer.valueOf(getPort())));
+            throw new LifecycleException(sm.getString("coyoteConnector.invalidPort", Integer.valueOf(getPort())));
         }
 
         setState(LifecycleState.STARTING);
@@ -1013,9 +1016,7 @@ public class Connector extends LifecycleMBeanBase  {
                 errPrefix += "service.getName(): \"" + this.service.getName() + "\"; ";
             }
 
-            throw new LifecycleException
-                (errPrefix + " " + sm.getString
-                 ("coyoteConnector.protocolHandlerStartFailed"), e);
+            throw new LifecycleException(errPrefix + " " + sm.getString("coyoteConnector.protocolHandlerStartFailed"), e);
         }
 
         mapperListener.start();

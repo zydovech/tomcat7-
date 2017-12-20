@@ -48,14 +48,12 @@ public final class ApplicationFilterFactory {
      * @deprecated  Use {@link Globals#DISPATCHER_TYPE_ATTR}
      */
     @Deprecated
-    public static final String DISPATCHER_TYPE_ATTR =
-            Globals.DISPATCHER_TYPE_ATTR;
+    public static final String DISPATCHER_TYPE_ATTR = Globals.DISPATCHER_TYPE_ATTR;
     /**
      * @deprecated  Use {@link Globals#DISPATCHER_REQUEST_PATH_ATTR}
      */
     @Deprecated
-    public static final String DISPATCHER_REQUEST_PATH_ATTR = 
-            Globals.DISPATCHER_REQUEST_PATH_ATTR;
+    public static final String DISPATCHER_REQUEST_PATH_ATTR = Globals.DISPATCHER_REQUEST_PATH_ATTR;
 
     private static ApplicationFilterFactory factory = null;
 
@@ -89,26 +87,24 @@ public final class ApplicationFilterFactory {
      * @param request The servlet request we are processing
      * @param servlet The servlet instance to be wrapped
      */
-    public ApplicationFilterChain createFilterChain
-        (ServletRequest request, Wrapper wrapper, Servlet servlet) {
+    public ApplicationFilterChain createFilterChain(ServletRequest request, Wrapper wrapper, Servlet servlet) {
 
         // get the dispatcher type
         DispatcherType dispatcher = null; 
         if (request.getAttribute(Globals.DISPATCHER_TYPE_ATTR) != null) {
-            dispatcher = (DispatcherType) request.getAttribute(
-                    Globals.DISPATCHER_TYPE_ATTR);
+            dispatcher = (DispatcherType) request.getAttribute(Globals.DISPATCHER_TYPE_ATTR);
         }
         String requestPath = null;
-        Object attribute = request.getAttribute(
-                Globals.DISPATCHER_REQUEST_PATH_ATTR);
+        Object attribute = request.getAttribute(Globals.DISPATCHER_REQUEST_PATH_ATTR);
         
         if (attribute != null){
             requestPath = attribute.toString();
         }
         
         // If there is no servlet to execute, return null
-        if (servlet == null)
+        if (servlet == null){
             return (null);
+        }
 
         boolean comet = false;
         
@@ -156,10 +152,10 @@ public final class ApplicationFilterFactory {
             if (!matchDispatcher(filterMaps[i] ,dispatcher)) {
                 continue;
             }
-            if (!matchFiltersURL(filterMaps[i], requestPath))
+            if (!matchFiltersURL(filterMaps[i], requestPath)){
                 continue;
-            ApplicationFilterConfig filterConfig = (ApplicationFilterConfig)
-                context.findFilterConfig(filterMaps[i].getFilterName());
+            }
+            ApplicationFilterConfig filterConfig = (ApplicationFilterConfig) context.findFilterConfig(filterMaps[i].getFilterName());
             if (filterConfig == null) {
                 // FIXME - log configuration problem
                 continue;
@@ -188,10 +184,10 @@ public final class ApplicationFilterFactory {
             if (!matchDispatcher(filterMaps[i] ,dispatcher)) {
                 continue;
             }
-            if (!matchFiltersServlet(filterMaps[i], servletName))
+            if (!matchFiltersServlet(filterMaps[i], servletName)){
                 continue;
-            ApplicationFilterConfig filterConfig = (ApplicationFilterConfig)
-                context.findFilterConfig(filterMaps[i].getFilterName());
+            }
+            ApplicationFilterConfig filterConfig = (ApplicationFilterConfig) context.findFilterConfig(filterMaps[i].getFilterName());
             if (filterConfig == null) {
                 // FIXME - log configuration problem
                 continue;

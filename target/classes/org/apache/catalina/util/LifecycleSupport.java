@@ -105,7 +105,7 @@ public final class LifecycleSupport {
      * Notify all lifecycle event listeners that a particular event has
      * occurred for this Container.  The default implementation performs
      * this notification synchronously using the calling thread.
-     *
+     * 将事件通知给所有监听当前容器的生命周期监听器LifecycleListener
      * @param type Event type
      * @param data Event data
      */

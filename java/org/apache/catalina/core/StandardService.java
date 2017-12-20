@@ -434,11 +434,10 @@ public class StandardService extends LifecycleMBeanBase implements Service {
     @Override
     protected void startInternal() throws LifecycleException {
 
-        if(log.isInfoEnabled())
-            log.info(sm.getString("standardService.start.name", this.name));
+        log.info(sm.getString("standardService.start.name", this.name));
         setState(LifecycleState.STARTING);
 
-        // Start our defined Container first
+        // Start our defined Container first 先启动容器
         if (container != null) {
             synchronized (container) {
                 container.start();
@@ -460,9 +459,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
                         connector.start();
                     }
                 } catch (Exception e) {
-                    log.error(sm.getString(
-                            "standardService.connector.startFailed",
-                            connector), e);
+                    log.error(sm.getString("standardService.connector.startFailed", connector), e);
                 }
             }
         }

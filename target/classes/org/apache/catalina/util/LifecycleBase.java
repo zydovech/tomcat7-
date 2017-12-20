@@ -36,8 +36,7 @@ public abstract class LifecycleBase implements Lifecycle {
 
     private static Log log = LogFactory.getLog(LifecycleBase.class);
 
-    private static StringManager sm =
-        StringManager.getManager("org.apache.catalina.util");
+    private static StringManager sm = StringManager.getManager("org.apache.catalina.util");
 
 
     /**
@@ -104,8 +103,7 @@ public abstract class LifecycleBase implements Lifecycle {
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
             setStateInternal(LifecycleState.FAILED, null, false);
-            throw new LifecycleException(
-                    sm.getString("lifecycleBase.initFail",toString()), t);
+            throw new LifecycleException(sm.getString("lifecycleBase.initFail",toString()), t);
         }
     }
 
@@ -118,8 +116,8 @@ public abstract class LifecycleBase implements Lifecycle {
     @Override
     public final synchronized void start() throws LifecycleException {
 
-        if (LifecycleState.STARTING_PREP.equals(state) || LifecycleState.STARTING.equals(state) ||
-                LifecycleState.STARTED.equals(state)) {
+        //如果已经处于启动状态 则直接返回
+        if (LifecycleState.STARTING_PREP.equals(state) || LifecycleState.STARTING.equals(state) || LifecycleState.STARTED.equals(state)) {
 
             if (log.isDebugEnabled()) {
                 Exception e = new LifecycleException();
@@ -132,11 +130,11 @@ public abstract class LifecycleBase implements Lifecycle {
         }
 
         if (state.equals(LifecycleState.NEW)) {
+            //如果状态是NEW 则初始化
             init();
         } else if (state.equals(LifecycleState.FAILED)) {
             stop();
-        } else if (!state.equals(LifecycleState.INITIALIZED) &&
-                !state.equals(LifecycleState.STOPPED)) {
+        } else if (!state.equals(LifecycleState.INITIALIZED) && !state.equals(LifecycleState.STOPPED)) {
             invalidTransition(Lifecycle.BEFORE_START_EVENT);
         }
 
@@ -390,8 +388,7 @@ public abstract class LifecycleBase implements Lifecycle {
     }
 
     private void invalidTransition(String type) throws LifecycleException {
-        String msg = sm.getString("lifecycleBase.invalidTransition", type,
-                toString(), state);
+        String msg = sm.getString("lifecycleBase.invalidTransition", type, toString(), state);
         throw new LifecycleException(msg);
     }
 }

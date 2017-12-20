@@ -372,7 +372,7 @@ public class JIoEndpoint extends AbstractEndpoint<Socket> {
 
 
     // -------------------- Public methods --------------------
-
+    //覆盖父类的方法 处理绑定端口的逻辑
     @Override
     public void bind() throws Exception {
 
@@ -388,13 +388,13 @@ public class JIoEndpoint extends AbstractEndpoint<Socket> {
 
         if (serverSocketFactory == null) {
             if (isSSLEnabled()) {
-                serverSocketFactory =
-                    handler.getSslImplementation().getServerSocketFactory(this);
+                serverSocketFactory = handler.getSslImplementation().getServerSocketFactory(this);
             } else {
                 serverSocketFactory = new DefaultServerSocketFactory(this);
             }
         }
 
+        //完成serverSocket的绑定操作
         if (serverSocket == null) {
             try {
                 if (getAddress() == null) {
@@ -434,8 +434,7 @@ public class JIoEndpoint extends AbstractEndpoint<Socket> {
             startAcceptorThreads();
 
             // Start async timeout thread
-            Thread timeoutThread = new Thread(new AsyncTimeout(),
-                    getName() + "-AsyncTimeout");
+            Thread timeoutThread = new Thread(new AsyncTimeout(), getName() + "-AsyncTimeout");
             timeoutThread.setPriority(threadPriority);
             timeoutThread.setDaemon(true);
             timeoutThread.start();

@@ -167,14 +167,16 @@ public final class InstanceSupport {
                                   ServletRequest request,
                                   ServletResponse response) {
 
-        if (listeners.length == 0)
+        if (listeners.length == 0){
             return;
+        }
 
-        InstanceEvent event = new InstanceEvent(wrapper, filter, type,
-                                                request, response);
+
+        InstanceEvent event = new InstanceEvent(wrapper, filter, type, request, response);
         InstanceListener interested[] = listeners;
-        for (int i = 0; i < interested.length; i++)
+        for (int i = 0; i < interested.length; i++){
             interested[i].instanceEvent(event);
+        }
 
     }
 
