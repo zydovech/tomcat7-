@@ -89,6 +89,9 @@ final class StandardWrapperValve
      *
      * @exception IOException if an input/output error occurred
      * @exception ServletException if a servlet error occurred
+     *
+     * 在这里会调用 filterChian 执行所有的过滤器
+     * 然后调用Servlet的service 方法
      */
     @Override
     public final void invoke(Request request, Response response) throws IOException, ServletException {

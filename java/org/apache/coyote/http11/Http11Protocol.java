@@ -58,7 +58,9 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol<Socket> {
 
 
     public Http11Protocol() {
+        //绑定端口 接收请求的socket 然后交给Http11ConnectionHandler进行处理
         endpoint = new JIoEndpoint();
+        //Http11ConnectionHandler Http11Protocol的内部类 处理socket
         cHandler = new Http11ConnectionHandler(this);
         ((JIoEndpoint) endpoint).setHandler(cHandler);
         setSoLinger(Constants.DEFAULT_CONNECTION_LINGER);

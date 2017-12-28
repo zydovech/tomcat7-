@@ -26,12 +26,12 @@ import javax.servlet.ServletContext;
 
 
 /**
+ *
  * Facade for the <b>StandardWrapper</b> object.
  *
  * @author Remy Maucherat
  */
-public final class StandardWrapperFacade
-    implements ServletConfig {
+public final class StandardWrapperFacade implements ServletConfig {
 
 
     // ----------------------------------------------------------- Constructors
@@ -41,7 +41,7 @@ public final class StandardWrapperFacade
      * Create a new facade around a StandardWrapper.
      */
     public StandardWrapperFacade(StandardWrapper config) {
-
+        //StandardWrapper实现了 ServletConfig 接口。。保存了Servlet的信息。。但是tomcat在初始化Servlet的时候 并不会直接使用StandardWrapper 而是包装为了StandardWrapperFacade
         super();
         this.config = config;
 
@@ -76,8 +76,9 @@ public final class StandardWrapperFacade
     public ServletContext getServletContext() {
         if (context == null) {
             context = config.getServletContext();
-            if ((context != null) && (context instanceof ApplicationContext))
+            if ((context != null) && (context instanceof ApplicationContext)){
                 context = ((ApplicationContext) context).getFacade();
+            }
         }
         return (context);
     }

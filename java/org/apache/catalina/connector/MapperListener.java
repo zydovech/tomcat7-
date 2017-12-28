@@ -106,7 +106,7 @@ public class MapperListener extends LifecycleMBeanBase
         // MBean listener won't be notified as those components will have
         // already registered their MBeans
         findDefaultHost();
-
+        //通过Connector来获取Service 再获取Service里面包含的容器就是Engine
         Engine engine = (Engine) connector.getService().getContainer();
         addListeners(engine);
 
@@ -190,8 +190,7 @@ public class MapperListener extends LifecycleMBeanBase
             String hostName = context.getParent().getName();
             String wrapperName = wrapper.getName();
             String mapping = (String) event.getData();
-            boolean jspWildCard = ("jsp".equals(wrapperName)
-                    && mapping.endsWith("/*"));
+            boolean jspWildCard = ("jsp".equals(wrapperName) && mapping.endsWith("/*"));
             mapper.addWrapper(hostName, contextPath, version, mapping, wrapper,
                     jspWildCard, context.isResourceOnlyServlet(wrapperName));
         } else if (Wrapper.REMOVE_MAPPING_EVENT.equals(event.getType())) {
@@ -370,27 +369,24 @@ public class MapperListener extends LifecycleMBeanBase
         Container host = context.getParent();
 
         javax.naming.Context resources = context.getResources();
+        //固定返回index.html index.htm index.jsp
         String[] welcomeFiles = context.findWelcomeFiles();
         List<WrapperMappingInfo> wrappers = new ArrayList<WrapperMappingInfo>();
-
+        //context的children是StandardWrapper   StandardWrapper就是一个servlet
+        //这里就是遍历该context下的所有servlet
         for (Container container : context.findChildren()) {
+            //把servlet 对应的servlet-mapping 全部分离 组装成WrapperMappingInfo 。一个servlet可以配置多个servlet-mapping 所以这里使用list来接收
             prepareWrapperMappingInfo(context, (Wrapper) container, wrappers);
-
-            if(log.isDebugEnabled()) {
-                log.debug(sm.getString("mapperListener.registerWrapper",
-                        container.getName(), contextPath, connector));
-            }
+            log.info(sm.getString("mapperListener.registerWrapper", container.getName(), contextPath, connector));
         }
-
+        //在Mapper中 增加ContextVersion
         mapper.addContextVersion(host.getName(), host, contextPath,
                 context.getWebappVersion(), context, welcomeFiles, resources,
                 wrappers, context.getMapperContextRootRedirectEnabled(),
                 context.getMapperDirectoryRedirectEnabled());
 
-        if(log.isDebugEnabled()) {
-            log.debug(sm.getString("mapperListener.registerContext",
-                    contextPath, connector));
-        }
+        log.info(sm.getString("mapperListener.registerContext", contextPath, connector));
+
     }
 
 
@@ -461,16 +457,16 @@ public class MapperListener extends LifecycleMBeanBase
      * @param wrapper
      * @param list
      */
-    private void prepareWrapperMappingInfo(Context context, Wrapper wrapper,
-            List<WrapperMappingInfo> wrappers) {
+    private void prepareWrapperMappingInfo(Context context, Wrapper wrapper, List<WrapperMappingInfo> wrappers) {
+        //获取servlet的名字     在<servlet-name> 中配置的名字
         String wrapperName = wrapper.getName();
         boolean resourceOnly = context.isResourceOnlyServlet(wrapperName);
+        //一个servlet可以对应不同的url-mapping 在<servlet-mapping>中配置的
         String[] mappings = wrapper.findMappings();
         for (String mapping : mappings) {
-            boolean jspWildCard = (wrapperName.equals("jsp")
-                                   && mapping.endsWith("/*"));
-            wrappers.add(new WrapperMappingInfo(mapping, wrapper, jspWildCard,
-                    resourceOnly));
+            boolean jspWildCard = (wrapperName.equals("jsp") && mapping.endsWith("/*"));
+            //把映射的url和wrapper（就是一个servlet）匹配起来 组装成一个WrapperMappingInfo 放到wrappers里面
+            wrappers.add(new WrapperMappingInfo(mapping, wrapper, jspWildCard, resourceOnly));
         }
     }
 

@@ -174,8 +174,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
     /**
      * The descriptive information string for this implementation.
      */
-    private static final String info =
-        "org.apache.catalina.core.StandardContext/1.0";
+    private static final String info = "org.apache.catalina.core.StandardContext/1.0";
 
 
     /**
@@ -249,8 +248,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
      * application, in the order they were encountered in the resulting merged
      * web.xml file.
      */
-    private ApplicationListener applicationListeners[] =
-            new ApplicationListener[0];
+    private ApplicationListener applicationListeners[] = new ApplicationListener[0];
 
     private final Object applicationListenersLock = new Object();
 
@@ -266,8 +264,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
      * SCIs and other code may use the pluggability APIs to add listener
      * instances directly to this list before the application starts.
      */
-    private Object applicationEventListenersObjects[] =
-        new Object[0];
+    private Object applicationEventListenersObjects[] = new Object[0];
 
 
     /**
@@ -275,22 +272,19 @@ public class StandardContext extends ContainerBase implements Context, Notificat
      * SCIs and other code may use the pluggability APIs to add listener
      * instances directly to this list before the application starts.
      */
-    private Object applicationLifecycleListenersObjects[] =
-        new Object[0];
+    private Object applicationLifecycleListenersObjects[] = new Object[0];
 
 
     /**
      * The ordered set of ServletContainerInitializers for this web application.
      */
-    private Map<ServletContainerInitializer,Set<Class<?>>> initializers =
-        new LinkedHashMap<ServletContainerInitializer,Set<Class<?>>>();
+    private Map<ServletContainerInitializer,Set<Class<?>>> initializers = new LinkedHashMap<ServletContainerInitializer,Set<Class<?>>>();
 
 
     /**
      * The set of application parameters defined for this application.
      */
-    private ApplicationParameter applicationParameters[] =
-        new ApplicationParameter[0];
+    private ApplicationParameter applicationParameters[] = new ApplicationParameter[0];
 
     private final Object applicationParametersLock = new Object();
 
@@ -309,8 +303,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
     /**
      * The Java class name of the CharsetMapper class to be created.
      */
-    private String charsetMapperClass =
-      "org.apache.catalina.util.CharsetMapper";
+    private String charsetMapperClass = "org.apache.catalina.util.CharsetMapper";
 
 
     /**
@@ -328,8 +321,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
     /**
      * The security constraints for this web application.
      */
-    private volatile SecurityConstraint constraints[] =
-            new SecurityConstraint[0];
+    private volatile SecurityConstraint constraints[] = new SecurityConstraint[0];
 
     private final Object constraintsLock = new Object();
 
@@ -419,24 +411,21 @@ public class StandardContext extends ContainerBase implements Context, Notificat
      * The exception pages for this web application, keyed by fully qualified
      * class name of the Java exception.
      */
-    private HashMap<String, ErrorPage> exceptionPages =
-        new HashMap<String, ErrorPage>();
+    private HashMap<String, ErrorPage> exceptionPages = new HashMap<String, ErrorPage>();
 
 
     /**
      * The set of filter configurations (and associated filter instances) we
      * have initialized, keyed by filter name.
      */
-    private HashMap<String, ApplicationFilterConfig> filterConfigs =
-        new HashMap<String, ApplicationFilterConfig>();
+    private HashMap<String, ApplicationFilterConfig> filterConfigs = new HashMap<String, ApplicationFilterConfig>();
 
 
     /**
      * The set of filter definitions for this application, keyed by
      * filter name.
      */
-    private HashMap<String, FilterDef> filterDefs =
-        new HashMap<String, FilterDef>();
+    private HashMap<String, FilterDef> filterDefs = new HashMap<String, FilterDef>();
 
 
     /**
@@ -577,8 +566,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
      * The security role mappings for this application, keyed by role
      * name (as used within the application).
      */
-    private HashMap<String, String> roleMappings =
-        new HashMap<String, String>();
+    private HashMap<String, String> roleMappings = new HashMap<String, String>();
 
 
     /**
@@ -593,8 +581,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
      * The servlet mappings for this web application, keyed by
      * matching pattern.
      */
-    private HashMap<String, String> servletMappings =
-        new HashMap<String, String>();
+    private HashMap<String, String> servletMappings = new HashMap<String, String>();
 
     private final Object servletMappingsLock = new Object();
 
@@ -1706,9 +1693,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
         boolean oldConfigured = this.configured;
         this.configured = configured;
-        support.firePropertyChange("configured",
-                                   oldConfigured,
-                                   this.configured);
+        support.firePropertyChange("configured", oldConfigured, this.configured);
 
     }
 
@@ -3420,16 +3405,15 @@ public class StandardContext extends ContainerBase implements Context, Notificat
      *  is not known to this Context
      */
     @Override
-    public void addServletMapping(String pattern, String name,
-                                  boolean jspWildCard) {
+    public void addServletMapping(String pattern, String name, boolean jspWildCard) {
         // Validate the proposed mapping
-        if (findChild(name) == null)
-            throw new IllegalArgumentException
-                (sm.getString("standardContext.servletMap.name", name));
+        if (findChild(name) == null){
+            throw new IllegalArgumentException(sm.getString("standardContext.servletMap.name", name));
+        }
         String decodedPattern = adjustURLPattern(RequestUtil.URLDecode(pattern));
-        if (!validateURLPattern(decodedPattern))
-            throw new IllegalArgumentException
-                (sm.getString("standardContext.servletMap.pattern", decodedPattern));
+        if (!validateURLPattern(decodedPattern)){
+            throw new IllegalArgumentException(sm.getString("standardContext.servletMap.pattern", decodedPattern));
+        }
 
         // Add this mapping to our registered set
         synchronized (servletMappingsLock) {
@@ -5387,9 +5371,6 @@ public class StandardContext extends ContainerBase implements Context, Notificat
     @Override
     protected synchronized void startInternal() throws LifecycleException {
 
-        if(log.isDebugEnabled()){
-           log.debug("Starting " + getBaseName());
-        }
         log.info("Starting " + getBaseName());
         // Send j2ee.state.starting notification
         if (this.getObjectName() != null) {
@@ -5407,14 +5388,14 @@ public class StandardContext extends ContainerBase implements Context, Notificat
         }
 
         // Add missing components as necessary
+        //设置资源
         if (webappResources == null) {   // (1) Required by Loader
             log.info("Configuring default Resources");
             try {
                 String docBase = getDocBase();
                 if (docBase == null) {
                     setResources(new EmptyDirContext());
-                } else if (docBase.endsWith(".war")
-                        && !(new File(getBasePath())).isDirectory()) {
+                } else if (docBase.endsWith(".war") && !(new File(getBasePath())).isDirectory()) {
                     setResources(new WARDirContext());
                 } else {
                     setResources(new FileDirContext());
@@ -5518,7 +5499,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
                 if ((resources != null) && (resources instanceof Lifecycle))
                     ((Lifecycle) resources).start();
 
-                // Notify our interested LifecycleListeners
+                // Notify our interested LifecycleListeners 这里会进行添加servlet的操作
                 fireLifecycleEvent(Lifecycle.CONFIGURE_START_EVENT, null);
 
                 // Start our child containers, if not already started
@@ -6525,27 +6506,33 @@ public class StandardContext extends ContainerBase implements Context, Notificat
      */
     private boolean validateURLPattern(String urlPattern) {
 
-        if (urlPattern == null)
+        if (urlPattern == null){
             return (false);
+        }
+        //不能包括 换行符
         if (urlPattern.indexOf('\n') >= 0 || urlPattern.indexOf('\r') >= 0) {
             return (false);
         }
         if (urlPattern.equals("")) {
             return true;
         }
+        // 以*.开头 且没有/的属于正常
         if (urlPattern.startsWith("*.")) {
             if (urlPattern.indexOf('/') < 0) {
                 checkUnusualURLPattern(urlPattern);
                 return (true);
-            } else
+            } else{
                 return (false);
+            }
+
         }
-        if ( (urlPattern.startsWith("/")) &&
-                (urlPattern.indexOf("*.") < 0)) {
+        // 以/开头的 且后面不包括*.的是正常的
+        if ( (urlPattern.startsWith("/")) && (urlPattern.indexOf("*.") < 0)) {
             checkUnusualURLPattern(urlPattern);
             return (true);
-        } else
+        } else{
             return (false);
+        }
 
     }
 
@@ -6680,8 +6667,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
         // Send j2ee.object.created notification
         if (this.getObjectName() != null) {
-            Notification notification = new Notification("j2ee.object.created",
-                    this.getObjectName(), sequenceNumber.getAndIncrement());
+            Notification notification = new Notification("j2ee.object.created", this.getObjectName(), sequenceNumber.getAndIncrement());
             broadcaster.sendNotification(notification);
         }
     }

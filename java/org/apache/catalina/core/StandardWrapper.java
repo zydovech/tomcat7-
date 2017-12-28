@@ -96,6 +96,7 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
     public StandardWrapper() {
 
         super();
+        //StandardWrapperValve 作为StandardWrapper的 基础阀门 主要是执行与该Servlet相关的所有过滤器 以及调用Servlet的service方法
         swValve=new StandardWrapperValve();
         pipeline.setBasic(swValve);
         broadcaster = new NotificationBroadcasterSupport();
@@ -129,8 +130,7 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
     /**
      * The facade associated with this wrapper.
      */
-    protected StandardWrapperFacade facade =
-        new StandardWrapperFacade(this);
+    protected StandardWrapperFacade facade = new StandardWrapperFacade(this);
 
 
     /**
@@ -173,6 +173,7 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
     /**
      * The initialization parameters for this servlet, keyed by
      * parameter name.
+     * Servlet的初始化参数
      */
     protected HashMap<String, String> parameters = new HashMap<String, String>();
 
@@ -295,14 +296,11 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
                                                          ServletResponse.class};
     
 
-    private final ReentrantReadWriteLock parametersLock =
-            new ReentrantReadWriteLock();
+    private final ReentrantReadWriteLock parametersLock = new ReentrantReadWriteLock();
 
-    private final ReentrantReadWriteLock mappingsLock =
-            new ReentrantReadWriteLock();
+    private final ReentrantReadWriteLock mappingsLock = new ReentrantReadWriteLock();
 
-    private final ReentrantReadWriteLock referencesLock =
-            new ReentrantReadWriteLock();
+    private final ReentrantReadWriteLock referencesLock = new ReentrantReadWriteLock();
 
 
     // ------------------------------------------------------------- Properties
@@ -732,9 +730,8 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
      */
     @Override
     public void addChild(Container child) {
-
-        throw new IllegalStateException
-            (sm.getString("standardWrapper.notChild"));
+        //StandardWrapper 没有子容器
+        throw new IllegalStateException(sm.getString("standardWrapper.notChild"));
 
     }
 
@@ -825,6 +822,9 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
      * @exception ServletException if the servlet init() method threw
      *  an exception
      * @exception ServletException if a loading error occurs
+     * 返回一个已经init过的Servlet实例 对于实现了SingleThreadModel和未实现的Servlet 进行不同的处理
+     * SingleThreadModel已经过时。。不能依靠他来进行同步。。还有程序部署在多个机器上面的可能。。
+     * 对于实现了SingleThreadModel接口的Servlet 会有一个对象池
      */
     @Override
     public Servlet allocate() throws ServletException {
@@ -836,7 +836,7 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
 
         boolean newInstance = false;
         
-        // If not SingleThreadedModel, return the same instance every time
+        // If not SingleThreadedModel, return the same instance every time如果不是singleThreadModel的 则每次返回同样的实例回去
         if (!singleThreadModel) {
             // Load and initialize our instance if necessary
             if (instance == null || !instanceInitialized) {
@@ -869,7 +869,7 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
                     }
                 }
             }
-
+            //这里再次 判断是否是singleThreadModel 。。因为在创建Servlet实例的时候 会判断是否实现了singleThreadModel接口
             if (singleThreadModel) {
                 if (newInstance) {
                     // Have to do this outside of the sync above to prevent a
@@ -891,11 +891,13 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
                 return instance;
             }
         }
-
+        //通过对instancePool 加锁来实现同一时间 有且只有一个线程可以得到Servlet的实例
         synchronized (instancePool) {
             while (countAllocated.get() >= nInstances) {
+                //如果已经分配出去的Servlet的数量  大于当前对象池中的实例数量。。则考虑新建
                 // Allocate a new instance if possible, or else wait
                 if (nInstances < maxInstances) {
+                    //如果对象池中的实例数量 小于最大实例数量 则新建
                     try {
                         instancePool.push(loadServlet());
                         nInstances++;
@@ -907,6 +909,7 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
                     }
                 } else {
                     try {
+                        //如果当前分配的实例数量 已经大于 最大数量 则等待
                         instancePool.wait();
                     } catch (InterruptedException e) {
                         // Ignore
@@ -916,6 +919,7 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
             if (log.isTraceEnabled()) {
                 log.trace("  Returning allocated STM instance");
             }
+            //对已经分配出去的数量 加1
             countAllocated.incrementAndGet();
             return instancePool.pop();
         }
@@ -933,7 +937,7 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
      */
     @Override
     public void deallocate(Servlet servlet) throws ServletException {
-
+        //对于非SingleThreadModel的Servlet 的servlet 只是简单的把countAllocated减小
         // If not SingleThreadModel, no action is required
         if (!singleThreadModel) {
             countAllocated.decrementAndGet();
@@ -944,6 +948,7 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
         synchronized (instancePool) {
             countAllocated.decrementAndGet();
             instancePool.push(servlet);
+            //对于SingleThreadModel的来说 会调用instancePool的wait方法进行等待
             instancePool.notify();
         }
 
@@ -1166,14 +1171,15 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
             }
 
             classLoadTime=(int) (System.currentTimeMillis() -t1);
-
+            //这里在创建了Servlet的实例之后，会通过判断是否实现了SingleThreadModel 来改变singleThreadModel的标志
             if (servlet instanceof SingleThreadModel) {
                 if (instancePool == null) {
+                    //若是 则新建一个实例池
                     instancePool = new Stack<Servlet>();
                 }
                 singleThreadModel = true;
             }
-
+            //调用Servlet的init方法
             initServlet(servlet);
 
             fireContainerEvent("load", this);
@@ -1238,12 +1244,13 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
     private synchronized void initServlet(Servlet servlet)
             throws ServletException {
         
-        if (instanceInitialized && !singleThreadModel) return;
+        if (instanceInitialized && !singleThreadModel) {
+            return;
+        }
 
         // Call the initialization method of this servlet
         try {
-            instanceSupport.fireInstanceEvent(InstanceEvent.BEFORE_INIT_EVENT,
-                                              servlet);
+            instanceSupport.fireInstanceEvent(InstanceEvent.BEFORE_INIT_EVENT, servlet);
 
             if( Globals.IS_SECURITY_ENABLED) {
                 boolean success = false;
@@ -1592,12 +1599,15 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
     @Override
     public ServletContext getServletContext() {
 
-        if (parent == null)
+        if (parent == null){
+            //StandardWrapper的parent 为StandardContext
+            //若父容器 为空 则代表 没有Context
             return (null);
-        else if (!(parent instanceof Context))
+        }else if (!(parent instanceof Context)){
             return (null);
-        else
+        } else {
             return (((Context) parent).getServletContext());
+        }
 
     }
 

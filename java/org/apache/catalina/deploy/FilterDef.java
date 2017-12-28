@@ -38,8 +38,7 @@ public class FilterDef implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private static final StringManager sm =
-        StringManager.getManager(Constants.Package);
+    private static final StringManager sm = StringManager.getManager(Constants.Package);
 
     // ------------------------------------------------------------- Properties
 

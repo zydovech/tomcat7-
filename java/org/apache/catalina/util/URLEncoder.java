@@ -35,8 +35,7 @@ import java.util.BitSet;
  */
 public class URLEncoder implements Cloneable {
 
-    protected static final char[] hexadecimal =
-            {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+    protected static final char[] hexadecimal = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 
     public static final URLEncoder DEFAULT = new URLEncoder();
     public static final URLEncoder QUERY = new URLEncoder();

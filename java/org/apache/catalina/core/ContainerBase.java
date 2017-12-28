@@ -1096,6 +1096,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
      *  processing
      * @exception ServletException if a ServletException was thrown
      *  while processing this request
+     *  对于Context或者Host等容器 调用invoke方法就是调用其Pipeline中的valve中的invoke方法
      */
     @Override
     public void invoke(Request request, Response response)

@@ -411,6 +411,9 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
      * NOTE: There is no maintenance of state or checking for valid transitions
      * within this class. It is expected that the connector will maintain state
      * and prevent invalid state transitions.
+     * 在Connector中initInternal 进行protocolHandler初始化
+     * AbstractProtocol实现了ProtocolHandler
+     * 具体协议的初始化操作 主要是对endpoint进行初始化。。来完成端口的绑定
      */
 
     @Override
@@ -549,8 +552,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
 
 
         @SuppressWarnings("deprecation") // Old HTTP upgrade method has been deprecated
-        public SocketState process(SocketWrapper<S> wrapper,
-                SocketStatus status) {
+        public SocketState process(SocketWrapper<S> wrapper, SocketStatus status) {
             if (wrapper == null) {
                 // Nothing to do. Socket has been closed.
                 return SocketState.CLOSED;
@@ -577,6 +579,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                     processor = recycledProcessors.poll();
                 }
                 if (processor == null) {
+                    //由子类实现。。Http11Processor
                     processor = createProcessor();
                 }
 
@@ -584,8 +587,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
 
                 SocketState state = SocketState.CLOSED;
                 do {
-                    if (status == SocketStatus.DISCONNECT &&
-                            !processor.isComet()) {
+                    if (status == SocketStatus.DISCONNECT && !processor.isComet()) {
                         // Do nothing here, just wait for it to get recycled
                         // Don't do this for Comet we need to generate an end
                         // event (see BZ 54022)
@@ -611,6 +613,8 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                     } else if (processor.isUpgrade()) {
                         state = processor.upgradeDispatch(status);
                     } else {
+                        //最终是调用 AbstractHttp11Processor的process方法
+                        //AbstractHttp11Processor 最后有三个实现 分别对应BIO AIO APR
                         state = processor.process(wrapper);
                     }
 

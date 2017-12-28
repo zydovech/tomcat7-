@@ -725,7 +725,7 @@ public abstract class AbstractEndpoint<S> {
     public final void init() throws Exception {
         testServerCipherSuitesOrderSupport();
         if (bindOnInit) {
-            //调用bind方法完成 端口绑定
+            //调用bind方法完成 端口绑定 该方法有三个实现类 分别对应AprEndpoint AioEndpoint BioEndpoint
             bind();
             bindState = BindState.BOUND_ON_INIT;
         }
@@ -740,7 +740,7 @@ public abstract class AbstractEndpoint<S> {
             }
         }
     }
-
+    //由
     public final void start() throws Exception {
         if (bindState == BindState.UNBOUND) {
             bind();
@@ -751,12 +751,16 @@ public abstract class AbstractEndpoint<S> {
 
     protected final void startAcceptorThreads() {
         int count = getAcceptorThreadCount();
+        //Acceptor是个抽象类 具体由不同的协议进行实现
         acceptors = new Acceptor[count];
 
         for (int i = 0; i < count; i++) {
+            //这里调用子类的createAcceptor 来创建具体的Acceptor
             acceptors[i] = createAcceptor();
             String threadName = getName() + "-Acceptor-" + i;
             acceptors[i].setThreadName(threadName);
+            //Acceptor实现了Runable接口。。在Acceptor的run方法中，启动accept来监听 是否有连接到来
+            //若连接到来 则交由Http11ConnectionHandler进行处理process JIOEndPoint把Http11ConnectionHandler作为handler
             Thread t = new Thread(acceptors[i], threadName);
             t.setPriority(getAcceptorThreadPriority());
             t.setDaemon(getDaemon());
@@ -830,13 +834,19 @@ public abstract class AbstractEndpoint<S> {
     }
 
     protected void countUpOrAwaitConnection() throws InterruptedException {
-        if (maxConnections==-1) return;
+        if (maxConnections==-1) {
+            return;
+        }
         LimitLatch latch = connectionLimitLatch;
-        if (latch!=null) latch.countUpOrAwait();
+        if (latch!=null){
+            latch.countUpOrAwait();
+        }
     }
 
     protected long countDownConnection() {
-        if (maxConnections==-1) return -1;
+        if (maxConnections==-1){
+            return -1;
+        }
         LimitLatch latch = connectionLimitLatch;
         if (latch!=null) {
             long result = latch.countDown();
@@ -844,7 +854,9 @@ public abstract class AbstractEndpoint<S> {
                 getLog().warn("Incorrect connection count, multiple socket.close called on the same socket." );
             }
             return result;
-        } else return -1;
+        } else {
+            return -1;
+        }
     }
 
     /**

@@ -88,6 +88,13 @@ public class CoyoteAdapter implements Adapter {
      * Construct a new CoyoteProcessor associated with the specified connector.
      *
      * @param connector CoyoteConnector that owns this processor
+     *  Connector监听到底层的请求之后 会中间经过一系列准备工作之后，创建org.apache.coyote.Request和org.apache.coyote.Response
+     *  交给CoyoteAdapter的service(org.apache.coyote.Request req,org.apache.coyote.Response res)方法
+     *
+     *  在这个方法内部会进行适配，也可以理解为转换，变成org.apache.catalina.connector.Request和org.apache.catalina.connector.Response，然后交给Container处理
+     *
+     *
+     *
      */
     public CoyoteAdapter(Connector connector) {
 

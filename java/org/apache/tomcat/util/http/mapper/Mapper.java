@@ -40,11 +40,9 @@ import org.apache.tomcat.util.res.StringManager;
 public final class Mapper {
 
 
-    private static final org.apache.juli.logging.Log log =
-        org.apache.juli.logging.LogFactory.getLog(Mapper.class);
+    private static final org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog(Mapper.class);
 
-    static final StringManager sm =
-        StringManager.getManager(Mapper.class.getPackage().getName());
+    static final StringManager sm = StringManager.getManager(Mapper.class.getPackage().getName());
 
     // ----------------------------------------------------- Instance Variables
 
@@ -91,16 +89,18 @@ public final class Mapper {
      * @param aliases Alias names for the virtual host
      * @param host Host object
      */
-    public synchronized void addHost(String name, String[] aliases,
-                                     Object host) {
+    public synchronized void addHost(String name, String[] aliases, Object host) {
+        //为啥用数组？
         Host[] newHosts = new Host[hosts.length + 1];
+        //新建一个Host
         Host newHost = new Host(name, host);
         if (insertMap(hosts, newHosts, newHost)) {
+            //插入成功 则改变hosts
             hosts = newHosts;
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("mapper.addHost.success", name));
-            }
+            log.info(sm.getString("mapper.addHost.success", name));
+
         } else {
+            //插入失败 则已经存在
             Host duplicate = hosts[find(hosts, name)];
             if (duplicate.object == host) {
                 // The host is already registered in the mapper.
@@ -110,8 +110,7 @@ public final class Mapper {
                 }
                 newHost = duplicate;
             } else {
-                log.error(sm.getString("mapper.duplicateHost", name,
-                        duplicate.getRealHostName()));
+                log.error(sm.getString("mapper.duplicateHost", name, duplicate.getRealHostName()));
                 // Do not add aliases, as removeHost(hostName) won't be able to
                 // remove them
                 return;
@@ -288,7 +287,7 @@ public final class Mapper {
      *
      * @param hostName Virtual host name this context belongs to
      * @param host Host object
-     * @param path Context path
+     * @param path Context path 比如webest-1.0-SNAPSHOT之类 文件夹的名字  每个目录都是一个context
      * @param version Context version
      * @param context Context object
      * @param welcomeResources Welcome files defined for this context
@@ -302,9 +301,12 @@ public final class Mapper {
             javax.naming.Context resources, Collection<WrapperMappingInfo> wrappers,
             boolean mapperContextRootRedirectEnabled, boolean mapperDirectoryRedirectEnabled) {
 
+        //通过hostName 来从hosts中查找 对应的host
         Host mappedHost = exactFind(hosts, hostName);
         if (mappedHost == null) {
+            //如果mappedHost为空，则新增一个
             addHost(hostName, new String[0], host);
+            //新增后 再次查找
             mappedHost = exactFind(hosts, hostName);
             if (mappedHost == null) {
                 log.error("No host found: " + hostName);
@@ -326,22 +328,25 @@ public final class Mapper {
             newContextVersion.mapperDirectoryRedirectEnabled = mapperDirectoryRedirectEnabled;
             
             if (wrappers != null) {
+                //把所有的映射关系 分别放到newContextVersion的wildcardWrappers  defaultWrapper exactWrappers extensionWrappers四个容器中
                 addWrappers(newContextVersion, wrappers);
             }
-
+            //获取当前host的ContextList
             ContextList contextList = mappedHost.contextList;
+            //根据path查找对应的Context
             Context mappedContext = exactFind(contextList.contexts, path);
             if (mappedContext == null) {
+                //没找到 则新建一个
                 mappedContext = new Context(path, newContextVersion);
-                ContextList newContextList = contextList.addContext(
-                        mappedContext, slashCount);
+                //增加到ContextList
+                ContextList newContextList = contextList.addContext(mappedContext, slashCount);
                 if (newContextList != null) {
+                    //更新 host中的contextList
                     updateContextList(mappedHost, newContextList);
                 }
             } else {
                 ContextVersion[] contextVersions = mappedContext.versions;
-                ContextVersion[] newContextVersions =
-                    new ContextVersion[contextVersions.length + 1];
+                ContextVersion[] newContextVersions = new ContextVersion[contextVersions.length + 1];
                 if (insertMap(contextVersions, newContextVersions, newContextVersion)) {
                     mappedContext.versions = newContextVersions;
                 } else {
@@ -445,11 +450,9 @@ public final class Mapper {
     }
 
 
-    public void addWrapper(String hostName, String contextPath, String version,
-                           String path, Object wrapper, boolean jspWildCard,
+    public void addWrapper(String hostName, String contextPath, String version, String path, Object wrapper, boolean jspWildCard,
                            boolean resourceOnly) {
-        ContextVersion contextVersion = findContextVersion(hostName,
-                contextPath, version, false);
+        ContextVersion contextVersion = findContextVersion(hostName, contextPath, version, false);
         if (contextVersion == null) {
             return;
         }
@@ -480,6 +483,7 @@ public final class Mapper {
      */
     private void addWrappers(ContextVersion contextVersion,
             Collection<WrapperMappingInfo> wrappers) {
+        //循环遍历所有的WrapperMappingInfo 把servlet和url的映射关系放在 wildcardWrappers  defaultWrapper exactWrappers extensionWrappers四个容器中
         for (WrapperMappingInfo wrapper : wrappers) {
             addWrapper(contextVersion, wrapper.getMapping(),
                     wrapper.getWrapper(), wrapper.isJspWildCard(),
@@ -492,7 +496,7 @@ public final class Mapper {
      *
      * @param context The context to which to add the wrapper
      * @param path Wrapper mapping
-     * @param wrapper The Wrapper object
+     * @param wrapper The Wrapper object 对应的是一个servlet
      * @param jspWildCard true if the wrapper corresponds to the JspServlet
      *   and the mapping path contains a wildcard; false otherwise
      * @param resourceOnly true if this wrapper always expects a physical
@@ -503,7 +507,7 @@ public final class Mapper {
 
         synchronized (context) {
             if (path.endsWith("/*")) {
-                // Wildcard wrapper
+                // Wildcard wrapper 若是以/*结尾 则是通配符匹配规则
                 String name = path.substring(0, path.length() - 2);
                 Wrapper newWrapper = new Wrapper(name, wrapper, jspWildCard,
                         resourceOnly);
@@ -1295,7 +1299,7 @@ public final class Mapper {
     /**
      * Find a map element given its name in a sorted array of map elements.
      * This will return the index for the closest inferior or equal item in the
-     * given array.
+     * given array. 主要是二分的思想
      * @see #exactFind(MapElement[], String)
      */
     private static final int find(MapElement[] map, String name) {
@@ -1513,16 +1517,16 @@ public final class Mapper {
      * Insert into the right place in a sorted MapElement array, and prevent
      * duplicates.
      */
-    private static final boolean insertMap
-        (MapElement[] oldMap, MapElement[] newMap, MapElement newElement) {
+    private static final boolean insertMap(MapElement[] oldMap, MapElement[] newMap, MapElement newElement) {
         int pos = find(oldMap, newElement.name);
+        //如果新增的MapElement已经存在 则返回
         if ((pos != -1) && (newElement.name.equals(oldMap[pos].name))) {
             return false;
         }
+        //两次copy 从中间劈开
         System.arraycopy(oldMap, 0, newMap, 0, pos + 1);
         newMap[pos + 1] = newElement;
-        System.arraycopy
-            (oldMap, pos + 1, newMap, pos + 2, oldMap.length - pos - 1);
+        System.arraycopy(oldMap, pos + 1, newMap, pos + 2, oldMap.length - pos - 1);
         return true;
     }
 
@@ -1563,10 +1567,13 @@ public final class Mapper {
 
     protected static final class Host extends MapElement {
 
+        //内部是一个Context的数组
         public volatile ContextList contextList;
 
         /**
          * Link to the "real" Host, shared by all aliases.
+         * 因为一个Host，可能是真正的一个Host，也可能只是起、一个别名，而在Mapper中，两者都是Host
+         * 只是真正的Host的realHost是自身，而alias的Host的realHost是其对应的真实的MapperHost
          */
         private final Host realHost;
 
@@ -1647,6 +1654,7 @@ public final class Mapper {
         public ContextList addContext(Context mappedContext, int slashCount) {
             Context[] newContexts = new Context[contexts.length + 1];
             if (insertMap(contexts, newContexts, mappedContext)) {
+                //新增成功 则返回新的ContextList
                 return new ContextList(newContexts, Math.max(nesting, slashCount));
             }
             return null;
@@ -1680,13 +1688,24 @@ public final class Mapper {
 
 
     protected static final class ContextVersion extends MapElement {
+        // context 的匹配路径
         public String path = null;
+
         public int slashCount;
+
+        //context 的欢迎页面
         public String[] welcomeResources = new String[0];
+
         public javax.naming.Context resources = null;
+        // 默认的wrapper
         public Wrapper defaultWrapper = null;
+        // 精确匹配路径的 wrapper
         public Wrapper[] exactWrappers = new Wrapper[0];
+
+        // 通配符结束的wrapper
         public Wrapper[] wildcardWrappers = new Wrapper[0];
+
+        // 扩展名匹配的wrapper
         public Wrapper[] extensionWrappers = new Wrapper[0];
         public int nesting = 0;
         public boolean mapperContextRootRedirectEnabled = false;

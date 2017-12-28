@@ -87,7 +87,8 @@ final class StandardContextValve extends ValveBase {
             return;
         }
 
-        // Select the Wrapper to be used for this Request
+        // Select the Wrapper to be used for this
+        // TODO Request 这个Wrapper啥时候 塞到request中的？
         Wrapper wrapper = request.getWrapper();
         if (wrapper == null || wrapper.isUnavailable()) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
@@ -107,6 +108,7 @@ final class StandardContextValve extends ValveBase {
         if (request.isAsyncSupported()) {
             request.setAsyncSupported(wrapper.getPipeline().isAsyncSupported());
         }
+        //都是直接调用Pipeline 的方法 不会调用ContainerBase中的invoke方法
         wrapper.getPipeline().getFirst().invoke(request, response);
     }
 
