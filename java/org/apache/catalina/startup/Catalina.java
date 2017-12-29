@@ -94,8 +94,7 @@ public class Catalina {
     /**
      * The shared extensions class loader for this server.
      */
-    protected ClassLoader parentClassLoader =
-        Catalina.class.getClassLoader();
+    protected ClassLoader parentClassLoader = Catalina.class.getClassLoader();
 
 
     /**
@@ -408,9 +407,9 @@ public class Catalina {
         addClusterRuleSet(digester, "Server/Service/Engine/Cluster/");
 
         long t2=System.currentTimeMillis();
-        if (log.isDebugEnabled()) {
-            log.debug("Digester for server.xml created " + ( t2-t1 ));
-        }
+
+        log.info("Digester for server.xml created " + ( t2-t1 ));
+
         return (digester);
 
     }
