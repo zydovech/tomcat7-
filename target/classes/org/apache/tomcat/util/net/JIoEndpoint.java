@@ -232,6 +232,7 @@ public class JIoEndpoint extends AbstractEndpoint<Socket> {
                     // Configure the socket
                     if (running && !paused && setSocketOptions(socket)) {
                         // Hand this socket off to an appropriate processor
+                        //调用processSocket 对socket进行处理
                         if (!processSocket(socket)) {
                             countDownConnection();
                             // Close socket right away
@@ -314,8 +315,16 @@ public class JIoEndpoint extends AbstractEndpoint<Socket> {
 
                     if ((state != SocketState.CLOSED)) {
                         if (status == null) {
+                            // org.apache.tomcat.util.net.JIoEndpoint.Handler#process
+                            // 在org.apache.coyote.http11.Http11Protocol构造函数中进行初始化
+                            /**
+                             *  1.在Http11Protocol的构造函数中会新建   JIoEndpoint() endpoint = new JIoEndpoint()
+                             *  2.然后新建Http11ConnectionHandler     cHandler = new Http11ConnectionHandler(this);
+                             *  3.然后通过setHandler设置handler
+                            */
                             state = handler.process(socket, SocketStatus.OPEN_READ);
                         } else {
+
                             state = handler.process(socket,status);
                         }
                     }
@@ -426,11 +435,13 @@ public class JIoEndpoint extends AbstractEndpoint<Socket> {
 
             // Create worker collection
             if (getExecutor() == null) {
+                //创建线程池
                 createExecutor();
             }
 
             initializeConnectionLatch();
 
+            //调用父类AbstractEndPoint 的startAcceptorThreads 方法。。模板模式
             startAcceptorThreads();
 
             // Start async timeout thread
@@ -528,7 +539,7 @@ public class JIoEndpoint extends AbstractEndpoint<Socket> {
             if (!running) {
                 return false;
             }
-            //执行任务
+            //从线程池获取数据 执行任务 处理链接
             getExecutor().execute(new SocketProcessor(wrapper));
         } catch (RejectedExecutionException x) {
             log.warn("Socket processing request was rejected for:"+socket,x);

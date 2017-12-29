@@ -243,8 +243,7 @@ public final class Parameters {
     private final ByteChunk origValue=new ByteChunk();
     CharChunk tmpNameC=new CharChunk(1024);
     public static final String DEFAULT_ENCODING = "ISO-8859-1";
-    private static final Charset DEFAULT_CHARSET =
-        Charset.forName(DEFAULT_ENCODING);
+    private static final Charset DEFAULT_CHARSET = Charset.forName(DEFAULT_ENCODING);
 
 
     public void processParameters( byte bytes[], int start, int len ) {
@@ -255,8 +254,7 @@ public final class Parameters {
                                   Charset charset) {
 
         if(log.isDebugEnabled()) {
-            log.debug(sm.getString("parameters.bytes",
-                    new String(bytes, start, len, DEFAULT_CHARSET)));
+            log.debug(sm.getString("parameters.bytes", new String(bytes, start, len, DEFAULT_CHARSET)));
         }
 
         int decodeFailCount = 0;
@@ -265,14 +263,21 @@ public final class Parameters {
         int end = start + len;
 
         while(pos < end) {
+            //初始化为pos， 参数名称开始位置
             int nameStart = pos;
+            //初始化为-1，  参数名称结束位置，通过nameStart和nameEnd可获得参数名称
             int nameEnd = -1;
-            int valueStart = -1;
-            int valueEnd = -1;
 
+            //初始化为-1，参数值开始位置
+            int valueStart = -1;
+            //初始化为-1, 参数值结束位置，通过valueStart和valueEnd可获得参数值
+            int valueEnd = -1;
+            //布尔类型，初始化为true，用来标识是否正在解析名称
             boolean parsingName = true;
             boolean decodeName = false;
             boolean decodeValue = false;
+
+            //布尔类型，初始化为false，用来标识一个parameter是否解析完成
             boolean parameterComplete = false;
 
             do {
@@ -301,7 +306,7 @@ public final class Parameters {
                         break;
                     case '%':
                     case '+':
-                        // Decoding required
+                        // Decoding required 是否需要解码
                         if (parsingName) {
                             decodeName = true;
                         } else {
@@ -349,13 +354,10 @@ public final class Parameters {
                     } else {
                         extract = "";
                     }
-                    String message = sm.getString("parameters.invalidChunk",
-                            Integer.valueOf(nameStart),
-                            Integer.valueOf(valueEnd), extract);
+                    String message = sm.getString("parameters.invalidChunk", Integer.valueOf(nameStart), Integer.valueOf(valueEnd), extract);
                     switch (logMode) {
                         case INFO_THEN_DEBUG:
                             message += sm.getString("parameters.fallToDebug");
-                            //$FALL-THROUGH$
                         case INFO:
                             log.info(message);
                             break;
@@ -508,8 +510,7 @@ public final class Parameters {
             data.toBytes();
         }
         ByteChunk bc=data.getByteChunk();
-        processParameters( bc.getBytes(), bc.getOffset(),
-                           bc.getLength(), getCharset(encoding));
+        processParameters( bc.getBytes(), bc.getOffset(), bc.getLength(), getCharset(encoding));
     }
 
     private Charset getCharset(String encoding) {

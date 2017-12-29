@@ -287,8 +287,9 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
     public void handshake(Socket sock) throws IOException {
         // We do getSession instead of startHandshake() so we can call this multiple times
         SSLSession session = ((SSLSocket)sock).getSession();
-        if (session.getCipherSuite().equals("SSL_NULL_WITH_NULL_NULL"))
+        if (session.getCipherSuite().equals("SSL_NULL_WITH_NULL_NULL")){
             throw new IOException("SSL handshake failed. Ciper suite in SSL Session is SSL_NULL_WITH_NULL_NULL");
+        }
 
         if (!allowUnsafeLegacyRenegotiation && !rfc5746Supported) {
             // Prevent further handshakes by removing all cipher suites

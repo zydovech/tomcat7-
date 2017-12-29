@@ -229,19 +229,20 @@ public final class ClassLoaderFactory {
 
         // Construct the class loader itself
         final URL[] array = set.toArray(new URL[set.size()]);
-        if (log.isDebugEnabled())
-            for (int i = 0; i < array.length; i++) {
-                log.debug("  location " + i + " is " + array[i]);
-            }
+
+        for (int i = 0; i < array.length; i++) {
+            log.info("  location " + i + " is " + array[i]);
+        }
 
         return AccessController.doPrivileged(
                 new PrivilegedAction<URLClassLoader>() {
                     @Override
                     public URLClassLoader run() {
-                        if (parent == null)
+                        if (parent == null){
                             return new URLClassLoader(array);
-                        else
+                        } else{
                             return new URLClassLoader(array, parent);
+                        }
                     }
                 });
     }

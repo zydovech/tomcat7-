@@ -51,7 +51,7 @@ public final class LifecycleSupport {
     }
 
 
-    // ----------------------------------------------------- Instance Variables
+    // ----------------------------------------------------- Instance Variables-
 
 
     /**
@@ -79,10 +79,11 @@ public final class LifecycleSupport {
     public void addLifecycleListener(LifecycleListener listener) {
 
       synchronized (listenersLock) {
-          LifecycleListener results[] =
-            new LifecycleListener[listeners.length + 1];
-          for (int i = 0; i < listeners.length; i++)
+          LifecycleListener results[] = new LifecycleListener[listeners.length + 1];
+          for (int i = 0; i < listeners.length; i++){
               results[i] = listeners[i];
+          }
+
           results[listeners.length] = listener;
           listeners = results;
       }

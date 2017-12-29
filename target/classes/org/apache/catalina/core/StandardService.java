@@ -59,8 +59,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
     /**
      * Descriptive information about this component implementation.
      */
-    private static final String info =
-        "org.apache.catalina.core.StandardService/1.0";
+    private static final String info = "org.apache.catalina.core.StandardService/1.0";
 
 
     /**
@@ -72,8 +71,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
     /**
      * The string manager for this package.
      */
-    private static final StringManager sm =
-        StringManager.getManager(Constants.Package);
+    private static final StringManager sm = StringManager.getManager(Constants.Package);
 
     /**
      * The <code>Server</code> that owns this Service, if any.
@@ -88,6 +86,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
 
     /**
      * The set of Connectors associated with this Service.
+     * 一个Service可以拥有多个Connector
      */
     protected Connector connectors[] = new Connector[0];
     private final Object connectorsLock = new Object();
@@ -101,6 +100,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
      * The Container associated with this Service. (In the case of the
      * org.apache.catalina.startup.Embedded subclass, this holds the most
      * recently added Engine.)
+     * 一个Service只有一个Container
      */
     protected Container container = null;
 

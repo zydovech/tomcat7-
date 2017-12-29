@@ -45,8 +45,7 @@ import org.apache.tomcat.util.res.StringManager;
  *
  * @author Craig R. McClanahan
  */
-public abstract class ValveBase extends LifecycleMBeanBase
-    implements Contained, Valve {
+public abstract class ValveBase extends LifecycleMBeanBase implements Contained, Valve {
 
     //------------------------------------------------------ Constructor
 
@@ -80,8 +79,7 @@ public abstract class ValveBase extends LifecycleMBeanBase
      * Descriptive information about this Valve implementation.  This value
      * should be overridden by subclasses.
      */
-    protected static final String info =
-        "org.apache.catalina.core.ValveBase/1.0";
+    protected static final String info = "org.apache.catalina.core.ValveBase/1.0";
 
 
     /**
@@ -93,8 +91,7 @@ public abstract class ValveBase extends LifecycleMBeanBase
     /**
      * The string manager for this package.
      */
-    protected static final StringManager sm =
-        StringManager.getManager(Constants.Package);
+    protected static final StringManager sm = StringManager.getManager(Constants.Package);
 
 
     //-------------------------------------------------------------- Properties

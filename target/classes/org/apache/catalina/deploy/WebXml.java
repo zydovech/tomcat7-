@@ -1385,6 +1385,7 @@ public class WebXml {
         for (ContextService service : serviceRefs.values()) {
             context.getNamingResources().addService(service);
         }
+        //servlets包含了当前Context下的所有的servlet的Map
         for (ServletDef servlet : servlets.values()) {
             Wrapper wrapper = context.createWrapper();
             // Description is ignored

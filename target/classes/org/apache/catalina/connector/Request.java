@@ -3226,8 +3226,7 @@ public class Request implements HttpServletRequest {
                     parameters.setQueryStringEncoding(enc);
                 }
             } else {
-                parameters.setEncoding
-                    (org.apache.coyote.Constants.DEFAULT_CHARACTER_ENCODING);
+                parameters.setEncoding(org.apache.coyote.Constants.DEFAULT_CHARACTER_ENCODING);
                 if (useBodyEncodingForURI) {
                     parameters.setQueryStringEncoding
                         (org.apache.coyote.Constants.DEFAULT_CHARACTER_ENCODING);

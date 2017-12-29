@@ -120,8 +120,7 @@ public abstract class AbstractInputBuffer<S> implements InputBuffer{
 
         // FIXME: Check for null ?
 
-        InputFilter[] newFilterLibrary = 
-            new InputFilter[filterLibrary.length + 1];
+        InputFilter[] newFilterLibrary = new InputFilter[filterLibrary.length + 1];
         for (int i = 0; i < filterLibrary.length; i++) {
             newFilterLibrary[i] = filterLibrary[i];
         }
@@ -283,10 +282,10 @@ public abstract class AbstractInputBuffer<S> implements InputBuffer{
     public int doRead(ByteChunk chunk, Request req) 
         throws IOException {
 
-        if (lastActiveFilter == -1)
+        if (lastActiveFilter == -1){
             return inputStreamInputBuffer.doRead(chunk, req);
-        else
+        } else{
             return activeFilters[lastActiveFilter].doRead(chunk,req);
-
+        }
     }
 }

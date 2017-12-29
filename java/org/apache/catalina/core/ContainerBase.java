@@ -1569,10 +1569,13 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
      */
     protected void threadStart() {
 
-        if (thread != null)
+        if (thread != null){
             return;
-        if (backgroundProcessorDelay <= 0)
+        }
+
+        if (backgroundProcessorDelay <= 0){
             return;
+        }
 
         threadDone = false;
         String threadName = "ContainerBackgroundProcessor[" + toString() + "]";

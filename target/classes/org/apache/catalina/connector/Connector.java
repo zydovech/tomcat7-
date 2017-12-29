@@ -66,6 +66,28 @@ public class Connector extends LifecycleMBeanBase  {
     *  在创建Digester的时候会绑定ConnectorCreateRule
     *  遇到Server/Service/Connector标签的时候 会调用ConnectorCreateRule的begin方法
     *  Connector con = new Connector(attributes.getValue("protocol"));
+     *
+     *   --------------------------------------------------------
+     *  |                                                        |
+     *  |  |-------------------------------------|               |
+     *  |  |                                     |               |
+     *  |  |   JIoEndpoint(绑定端口)              |               |
+     *  |  |                                     |               |
+     *  |  |                                     |               |
+     *  |  |                                     |               |
+     *  |  |                      Http11Protocol |               |
+     *  |  |                                     |  Connector    |
+     *  |  | Http11ConnectionHandler(处理socket)  |               |
+     *  |  |                                     |               |
+     *  |  |                                     |               |
+     *  |  |                                     |               |
+     *  |  |  CoyoteAdapter一样
+     *       (Connector和Connector)              |               |
+     *  |  |                                     |               |
+     *  |  |                                     |               |
+     *  |   ------------------------------------ |               |
+     *  |                                                        |
+     *   --------------------------------------------------------
     */
     public Connector(String protocol) {
         //根据protocol 设置连接器使用的protocolHandlerClassName
@@ -74,6 +96,7 @@ public class Connector extends LifecycleMBeanBase  {
         try {
             //通过反射创建实例
             Class<?> clazz = Class.forName(protocolHandlerClassName);
+            //通过server.xml的配置 这里得到协议的处理实例 对应Apr BIO AIO三种
             this.protocolHandler = (ProtocolHandler) clazz.newInstance();
         } catch (Exception e) {
             log.error(sm.getString("coyoteConnector.protocolHandlerInstantiationFailed"), e);
@@ -220,6 +243,11 @@ public class Connector extends LifecycleMBeanBase  {
 
     /**
      * Coyote protocol handler.
+     *
+     * ProtocolHandler 协议的处理类 主要有三种
+     * 1.Http11Protocol 针对最简单的BIO
+     * 2.Http11NIOProtocol 针对java中的NIO
+     * 3.Http11AprProtocol 针对APR进行处理
      */
     protected ProtocolHandler protocolHandler = null;
 
@@ -596,21 +624,26 @@ public class Connector extends LifecycleMBeanBase  {
     public void setProtocol(String protocol) {
 
         if (AprLifecycleListener.isAprAvailable()) {
+            //若开启APR 则HTTP/1.1代表的是org.apache.coyote.http11.Http11AprProtocol
             if ("HTTP/1.1".equals(protocol)) {
                 setProtocolHandlerClassName("org.apache.coyote.http11.Http11AprProtocol");
             } else if ("AJP/1.3".equals(protocol)) {
                 setProtocolHandlerClassName("org.apache.coyote.ajp.AjpAprProtocol");
             } else if (protocol != null) {
+                //协议不为空的时候  设置对应的协议。。
                 setProtocolHandlerClassName(protocol);
             } else {
+                //默认也是org.apache.coyote.http11.Http11AprProtocol
                 setProtocolHandlerClassName("org.apache.coyote.http11.Http11AprProtocol");
             }
         } else {
             if ("HTTP/1.1".equals(protocol)) {
+                //未开启APR HTTP/1.1 代表org.apache.coyote.http11.Http11Protocol
                 setProtocolHandlerClassName("org.apache.coyote.http11.Http11Protocol");
             } else if ("AJP/1.3".equals(protocol)) {
                 setProtocolHandlerClassName("org.apache.coyote.ajp.AjpProtocol");
             } else if (protocol != null) {
+                //协议不为空的时候  设置对应的协议。。
                 setProtocolHandlerClassName(protocol);
             }
         }
@@ -959,8 +992,10 @@ public class Connector extends LifecycleMBeanBase  {
 
         super.initInternal();
 
-        // Initialize adapter
+        // Initialize adapter 初始化适配器 用于适配连接器和容器
         adapter = new CoyoteAdapter(this);
+
+        //并将adapter设置Handler的适配器
         protocolHandler.setAdapter(adapter);
 
         // Make sure parseBodyMethodsSet has a default
@@ -1009,6 +1044,9 @@ public class Connector extends LifecycleMBeanBase  {
         setState(LifecycleState.STARTING);
 
         try {
+            //这里调用AbstractProtocol的start方法进行 协议启动。。主要就是调用endPoint方法进行启动
+            //endPoint的启动交给 AbstractEndPoint进行启动。。在AbstractEndPoint启动过程中调用 JIoEndPoint的启动方法进行启动
+            //主要是创建线程池。。和启动AcceptorThreads
             protocolHandler.start();
         } catch (Exception e) {
             String errPrefix = "";
@@ -1018,7 +1056,7 @@ public class Connector extends LifecycleMBeanBase  {
 
             throw new LifecycleException(errPrefix + " " + sm.getString("coyoteConnector.protocolHandlerStartFailed"), e);
         }
-
+        //TODO 这里是对Mapper中进行处理
         mapperListener.start();
     }
 

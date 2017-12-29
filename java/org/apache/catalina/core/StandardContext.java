@@ -460,8 +460,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
     /**
      * The mapper associated with this context.
      */
-    private org.apache.tomcat.util.http.mapper.Mapper mapper =
-        new org.apache.tomcat.util.http.mapper.Mapper();
+    private org.apache.tomcat.util.http.mapper.Mapper mapper = new org.apache.tomcat.util.http.mapper.Mapper();
 
 
     /**
@@ -4575,8 +4574,10 @@ public class StandardContext extends ContainerBase implements Context, Notificat
         }
 
         // Inform interested listeners
-        if(this.getState().equals(LifecycleState.STARTED))
+        if(this.getState().equals(LifecycleState.STARTED)){
             fireContainerEvent(REMOVE_WELCOME_FILE_EVENT, name);
+
+        }
 
     }
 

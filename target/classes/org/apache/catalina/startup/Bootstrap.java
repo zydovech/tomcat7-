@@ -85,6 +85,7 @@ public final class Bootstrap {
 
     private void initClassLoaders() {
         try {
+            //commonLoader 和catalinaLoader 和sharedLoader都是同一个 都是URLClassLoader URLClassLoader 可以从指定的目录中加载class
             commonLoader = createClassLoader("common", null);
             log.info(commonLoader);
             if( commonLoader == null ) {

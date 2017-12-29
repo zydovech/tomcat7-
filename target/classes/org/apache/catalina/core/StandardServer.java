@@ -774,7 +774,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
         setState(LifecycleState.STOPPING);
         fireLifecycleEvent(CONFIGURE_STOP_EVENT, null);
         
-        // Stop our defined Services
+        // Stop our defined Services 停止所有的组件
         for (int i = 0; i < services.length; i++) {
             services[i].stop();
         }

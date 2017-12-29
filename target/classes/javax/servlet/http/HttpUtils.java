@@ -154,14 +154,14 @@ public class HttpUtils {
      *                        sent by the POST method is invalid
      *
      */
-    public static Hashtable<String,String[]> parsePostData(int len, 
-                                          ServletInputStream in) {
+    public static Hashtable<String,String[]> parsePostData(int len, ServletInputStream in) {
         // XXX
         // should a length of 0 be an IllegalArgumentException
         
         // cheap hack to return an empty hash
-        if (len <=0) 
+        if (len <=0) {
             return new Hashtable<String,String[]>();
+        }
 
         if (in == null) {
             throw new IllegalArgumentException();

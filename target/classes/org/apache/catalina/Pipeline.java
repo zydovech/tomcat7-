@@ -44,6 +44,7 @@ public interface Pipeline {
 
 
     /**
+     *
      * <p>Return the Valve instance that has been distinguished as the basic
      * Valve for this Pipeline (if any).
      */
@@ -59,7 +60,7 @@ public interface Pipeline {
      * if this Valve chooses not to be associated with this Container, or
      * <code>IllegalStateException</code> if it is already associated with
      * a different Container.</p>
-     *
+     *  设置基础阀门 （基础阀门为最后一个阀门）
      * @param valve Valve to be distinguished as the basic Valve
      */
     public void setBasic(Valve valve);
@@ -90,6 +91,7 @@ public interface Pipeline {
      *  associated with this Container
      * @exception IllegalStateException if the specified Valve is already
      *  associated with a different Container
+     *  增加一个阀门
      */
     public void addValve(Valve valve);
 
@@ -111,7 +113,7 @@ public interface Pipeline {
      * <p>Implementation note: Implementations are expected to trigger the
      * {@link Container#REMOVE_VALVE_EVENT} for the associated container if this
      * call is successful.</p>
-     *
+     * 删除一个阀门
      * @param valve Valve to be removed
      */
     public void removeValve(Valve valve);
@@ -120,6 +122,7 @@ public interface Pipeline {
     /**
      * <p>Return the Valve instance that has been distinguished as the basic
      * Valve for this Pipeline (if any).
+     * 获取第一个阀门
      */
     public Valve getFirst();
 
@@ -132,6 +135,7 @@ public interface Pipeline {
 
     /**
      * Return the Container with which this Pipeline is associated.
+     * 每个Pipeline都和 一个容器相关联
      */
     public Container getContainer();
 

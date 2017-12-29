@@ -369,7 +369,7 @@ public class ContextConfig implements LifecycleListener {
 
     /**
      * Process events for an associated Context.
-     *
+     * 处理来自StandardContext的事件
      * @param event The lifecycle event that has occurred
      */
     @Override
@@ -563,6 +563,7 @@ public class ContextConfig implements LifecycleListener {
 
 
     protected String getBaseDir() {
+        //从系统属性中获取 或者从StandardEngine中获取。。
         Container engineC=context.getParent().getParent();
         if( engineC instanceof StandardEngine ) {
             return ((StandardEngine)engineC).getBaseDir();
@@ -688,17 +689,18 @@ public class ContextConfig implements LifecycleListener {
         throws IOException {
 
         Host host = (Host) context.getParent();
+        //得到appBase.... 在web.xml中进行了配置
         String appBase = host.getAppBase();
 
         File canonicalAppBase = new File(appBase);
         if (canonicalAppBase.isAbsolute()) {
+            //如果是绝对路径 则canonicalAppBase 就是其对应的值
             canonicalAppBase = canonicalAppBase.getCanonicalFile();
         } else {
-            canonicalAppBase =
-                new File(getBaseDir(), appBase)
-                .getCanonicalFile();
+            //如果是相对路径 则添加BaseDir
+            canonicalAppBase = new File(getBaseDir(), appBase).getCanonicalFile();
         }
-
+        //从context中获取docBase 在xml中进行了配置
         String docBase = context.getDocBase();
         if (docBase == null) {
             // Trying to guess the docBase according to the path
@@ -712,15 +714,16 @@ public class ContextConfig implements LifecycleListener {
 
         File file = new File(docBase);
         if (!file.isAbsolute()) {
+            //若docBase不是绝对路径 则在相对路径前面加上canonicalAppBase
             docBase = (new File(canonicalAppBase, docBase)).getPath();
         } else {
+            //是绝对路径的话 则和canonicalAppBase没有关系了
             docBase = file.getCanonicalPath();
         }
         file = new File(docBase);
         String origDocBase = docBase;
 
-        ContextName cn = new ContextName(context.getPath(),
-                context.getWebappVersion());
+        ContextName cn = new ContextName(context.getPath(), context.getWebappVersion());
         String pathName = cn.getBaseName();
 
         boolean unpackWARs = true;
@@ -732,8 +735,10 @@ public class ContextConfig implements LifecycleListener {
         }
 
         if (docBase.toLowerCase(Locale.ENGLISH).endsWith(".war") && !file.isDirectory()) {
+            //若docBase以.war结尾 且不是一个目录
             URL war = UriUtil.buildJarUrl(new File(docBase));
             if (unpackWARs) {
+                //这里会对war进行解压缩
                 docBase = ExpandWar.expand(host, war, pathName);
                 file = new File(docBase);
                 docBase = file.getCanonicalPath();
@@ -746,8 +751,10 @@ public class ContextConfig implements LifecycleListener {
         } else {
             File docDir = new File(docBase);
             if (!docDir.exists()) {
+                //若配置的目录不存在 。则在目录名后面添加.war
                 File warFile = new File(docBase + ".war");
                 if (warFile.exists()) {
+                    //若存在 则直接使用
                     URL war = UriUtil.buildJarUrl(warFile);
                     if (unpackWARs) {
                         docBase = ExpandWar.expand(host, war, pathName);
@@ -859,10 +866,10 @@ public class ContextConfig implements LifecycleListener {
     protected synchronized void beforeStart() {
 
         try {
+
             fixDocBase();
         } catch (IOException e) {
-            log.error(sm.getString(
-                    "contextConfig.fixDocBase", context.getName()), e);
+            log.error(sm.getString("contextConfig.fixDocBase", context.getName()), e);
         }
 
         antiLocking();
@@ -875,15 +882,9 @@ public class ContextConfig implements LifecycleListener {
     protected synchronized void configureStart() {
         // Called from StandardContext.start()
 
-        if (log.isDebugEnabled())
-            log.debug(sm.getString("contextConfig.start"));
+        log.info(sm.getString("contextConfig.start"));
 
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("contextConfig.xmlSettings",
-                    context.getName(),
-                    Boolean.valueOf(context.getXmlValidation()),
-                    Boolean.valueOf(context.getXmlNamespaceAware())));
-        }
+        log.info(sm.getString("contextConfig.xmlSettings", context.getName(), Boolean.valueOf(context.getXmlValidation()), Boolean.valueOf(context.getXmlNamespaceAware())));
 
         webConfig();
 

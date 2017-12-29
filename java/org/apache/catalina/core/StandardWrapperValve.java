@@ -49,8 +49,7 @@ import org.apache.tomcat.util.res.StringManager;
  *
  * @author Craig R. McClanahan
  */
-final class StandardWrapperValve
-    extends ValveBase {
+final class StandardWrapperValve extends ValveBase {
 
     //------------------------------------------------------ Constructor
     public StandardWrapperValve() {

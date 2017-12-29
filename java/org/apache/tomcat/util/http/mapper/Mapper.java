@@ -64,7 +64,7 @@ public final class Mapper {
      * <p>
      * It is used only by Mapper in a Context. Is not used by Mapper in a
      * Connector.
-     *
+     * 这个只用于 Context中的Mapper   对于存在于Connector中的Mapper,不使用
      * @see #setContext(String, String[], javax.naming.Context)
      */
     ContextVersion context = new ContextVersion();

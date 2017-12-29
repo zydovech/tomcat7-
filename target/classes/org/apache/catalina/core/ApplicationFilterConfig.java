@@ -248,8 +248,9 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
         InvocationTargetException, NamingException {
 
         // Return the existing filter instance, if any
-        if (this.filter != null)
+        if (this.filter != null){
             return (this.filter);
+        }
 
         // Identify the class loader we will be using
         String filterClass = filterDef.getFilterClass();

@@ -59,8 +59,7 @@ public class RequestFacade implements HttpServletRequest {
 
     // ----------------------------------------------------------- DoPrivileged
 
-    private final class GetAttributePrivilegedAction
-            implements PrivilegedAction<Enumeration<String>> {
+    private final class GetAttributePrivilegedAction implements PrivilegedAction<Enumeration<String>> {
 
         @Override
         public Enumeration<String> run() {
@@ -69,8 +68,7 @@ public class RequestFacade implements HttpServletRequest {
     }
 
 
-    private final class GetParameterMapPrivilegedAction
-            implements PrivilegedAction<Map<String,String[]>> {
+    private final class GetParameterMapPrivilegedAction implements PrivilegedAction<Map<String,String[]>> {
 
         @Override
         public Map<String,String[]> run() {
@@ -79,8 +77,7 @@ public class RequestFacade implements HttpServletRequest {
     }
 
 
-    private final class GetRequestDispatcherPrivilegedAction
-            implements PrivilegedAction<RequestDispatcher> {
+    private final class GetRequestDispatcherPrivilegedAction implements PrivilegedAction<RequestDispatcher> {
 
         private final String path;
 
@@ -95,8 +92,7 @@ public class RequestFacade implements HttpServletRequest {
     }
 
 
-    private final class GetParameterPrivilegedAction
-            implements PrivilegedAction<String> {
+    private final class GetParameterPrivilegedAction implements PrivilegedAction<String> {
 
         public String name;
 
@@ -111,8 +107,7 @@ public class RequestFacade implements HttpServletRequest {
     }
 
 
-    private final class GetParameterNamesPrivilegedAction
-            implements PrivilegedAction<Enumeration<String>> {
+    private final class GetParameterNamesPrivilegedAction implements PrivilegedAction<Enumeration<String>> {
 
         @Override
         public Enumeration<String> run() {
@@ -121,8 +116,7 @@ public class RequestFacade implements HttpServletRequest {
     }
 
 
-    private final class GetParameterValuePrivilegedAction
-            implements PrivilegedAction<String[]> {
+    private final class GetParameterValuePrivilegedAction implements PrivilegedAction<String[]> {
 
         public String name;
 
@@ -137,8 +131,7 @@ public class RequestFacade implements HttpServletRequest {
     }
 
 
-    private final class GetCookiesPrivilegedAction
-            implements PrivilegedAction<Cookie[]> {
+    private final class GetCookiesPrivilegedAction implements PrivilegedAction<Cookie[]> {
 
         @Override
         public Cookie[] run() {
@@ -147,8 +140,7 @@ public class RequestFacade implements HttpServletRequest {
     }
 
 
-    private final class GetCharacterEncodingPrivilegedAction
-            implements PrivilegedAction<String> {
+    private final class GetCharacterEncodingPrivilegedAction implements PrivilegedAction<String> {
 
         @Override
         public String run() {
@@ -157,8 +149,7 @@ public class RequestFacade implements HttpServletRequest {
     }
 
 
-    private final class GetHeadersPrivilegedAction
-            implements PrivilegedAction<Enumeration<String>> {
+    private final class GetHeadersPrivilegedAction implements PrivilegedAction<Enumeration<String>> {
 
         private final String name;
 
@@ -371,13 +362,11 @@ public class RequestFacade implements HttpServletRequest {
     public String getParameter(String name) {
 
         if (request == null) {
-            throw new IllegalStateException(
-                            sm.getString("requestFacade.nullRequest"));
+            throw new IllegalStateException(sm.getString("requestFacade.nullRequest"));
         }
 
         if (Globals.IS_SECURITY_ENABLED){
-            return AccessController.doPrivileged(
-                new GetParameterPrivilegedAction(name));
+            return AccessController.doPrivileged(new GetParameterPrivilegedAction(name));
         } else {
             return request.getParameter(name);
         }
@@ -790,8 +779,7 @@ public class RequestFacade implements HttpServletRequest {
     public String getQueryString() {
 
         if (request == null) {
-            throw new IllegalStateException(
-                            sm.getString("requestFacade.nullRequest"));
+            throw new IllegalStateException(sm.getString("requestFacade.nullRequest"));
         }
 
         return request.getQueryString();
