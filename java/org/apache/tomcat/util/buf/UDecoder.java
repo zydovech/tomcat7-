@@ -98,21 +98,28 @@ public final class UDecoder {
 
         for( int j=idx; j<end; j++, idx++ ) {
             if( buff[ j ] == '+' && query) {
+
+                //如果是+ 则直接转换为空格
                 buff[idx]= (byte)' ' ;
             } else if( buff[ j ] != '%' ) {
+
+                //如果不是% 则代表是正常的字符。直接赋值
                 buff[idx]= buff[j];
             } else {
+                //如果是% 则读取后面两个字符，合并为一个
                 // read next 2 digits
                 if( j+2 >= end ) {
                     throw EXCEPTION_EOF;
                 }
                 byte b1= buff[j+1];
                 byte b2=buff[j+2];
+                //必须是十六进制的数字
                 if( !isHexDigit( b1 ) || ! isHexDigit(b2 )) {
                     throw EXCEPTION_NOT_HEX_DIGIT;
                 }
 
                 j+=2;
+                //合并为一个字节 比如%26 被转换为26
                 int res=x2c( b1, b2 );
                 if (noSlash && (res == '/')) {
                     throw EXCEPTION_SLASH;

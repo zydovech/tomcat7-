@@ -1198,7 +1198,9 @@ public class Request implements HttpServletRequest {
     @Override
     public Enumeration<String> getParameterNames() {
 
+        //第一次进来的时候 会进行参数的解析
         if (!parametersParsed) {
+            //parseParameters的第一步操作就是把parametersParsed给设置为true
             parseParameters();
         }
 
@@ -2802,7 +2804,6 @@ public class Request implements HttpServletRequest {
         if (parts != null || partsParseException != null) {
             return;
         }
-
         MultipartConfigElement mce = getWrapper().getMultipartConfigElement();
 
         if (mce == null) {
@@ -3213,8 +3214,10 @@ public class Request implements HttpServletRequest {
         boolean success = false;
         try {
             // Set this every time in case limit has been changed via JMX
+            //设置最大的参数值
             parameters.setLimit(getConnector().getMaxParameterCount());
 
+            //下面是设置编码
             // getCharacterEncoding() may have been overridden to search for
             // hidden form field containing request encoding
             String enc = getCharacterEncoding();
@@ -3232,36 +3235,43 @@ public class Request implements HttpServletRequest {
                         (org.apache.coyote.Constants.DEFAULT_CHARACTER_ENCODING);
                 }
             }
-
+            //解析请求url中带有的查询参数
             parameters.handleQueryParameters();
 
+            //这里应该是若其他人 已经在调用读取消息体的方法 解析到此结束
             if (usingInputStream || usingReader) {
                 success = true;
                 return;
             }
 
+            //只有POST方法 才会对body中的参数进行解析
             if( !getConnector().isParseBodyMethod(getMethod()) ) {
                 success = true;
                 return;
             }
 
+            //获取contentType
             String contentType = getContentType();
             if (contentType == null) {
                 contentType = "";
             }
+            //contentType的格式一般是multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW 中间有;分割
             int semicolon = contentType.indexOf(';');
             if (semicolon >= 0) {
+                //若有分割。则取得真正的类型
                 contentType = contentType.substring(0, semicolon).trim();
             } else {
                 contentType = contentType.trim();
             }
 
+            //若是multipart/form-data 在此进行解析
             if ("multipart/form-data".equals(contentType)) {
+                //暂时不管 用于文件上传的
                 parseParts();
                 success = true;
                 return;
             }
-
+            //若不是application/x-www-form-urlencoded 则不解析body里的面的值
             if (!("application/x-www-form-urlencoded".equals(contentType))) {
                 success = true;
                 return;
@@ -3290,6 +3300,7 @@ public class Request implements HttpServletRequest {
                     formData = new byte[len];
                 }
                 try {
+                    //获取body的字节数据，经过url-encode的
                     if (readPostBody(formData, len) != len) {
                         parameters.setParseFailedReason(FailReason.REQUEST_BODY_INCOMPLETE);
                         return;
@@ -3303,6 +3314,7 @@ public class Request implements HttpServletRequest {
                     parameters.setParseFailedReason(FailReason.CLIENT_DISCONNECT);
                     return;
                 }
+                //解析body里的参数信息。放到参数里。这样可以通过getParamter获取到
                 parameters.processParameters(formData, 0, len);
             } else if ("chunked".equalsIgnoreCase(
                     coyoteRequest.getHeader("transfer-encoding"))) {

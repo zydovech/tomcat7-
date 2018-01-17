@@ -68,9 +68,10 @@
          APR (HTTP/AJP) Connector: /docs/apr.html
          Define a non-SSL HTTP/1.1 Connector on port 8080
     -->
-    <Connector port="5264" protocol="org.apache.coyote.http11.Http11Protocol"
+    <Connector port="8080" protocol="HTTP/1.1"
                connectionTimeout="20000"
-               redirectPort="8443" />
+               redirectPort="8443"
+               URIEncoding="UTF-8"/>
     <!-- A "Connector" using the shared thread pool-->
     <!--
     <Connector executor="tomcatThreadPool"
@@ -136,7 +137,7 @@
         <Valve className="org.apache.catalina.valves.AccessLogValve" directory="logs"
                prefix="localhost_access_log." suffix=".txt"
                pattern="%h %l %u %t &quot;%r&quot; %s %b" />
-        <Context docBase="F:\study\tomcat\webest\target\webest-1.0-SNAPSHOT\" path="/" debug="0" reloadable="false"/>
+        <Context docBase="D:\zkml_pay2.0\trunk\pay-web\target\pay-web" path="" debug="0" reloadable="true"/>
       </Host>
     </Engine>
   </Service>

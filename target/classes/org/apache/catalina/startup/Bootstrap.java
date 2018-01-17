@@ -208,6 +208,7 @@ public final class Bootstrap {
         setCatalinaHome();
         setCatalinaBase();
 
+        //初始化类加载器 为URLClassLoader
         initClassLoaders();
         //设置线程上下文
         Thread.currentThread().setContextClassLoader(catalinaLoader);
@@ -257,6 +258,7 @@ public final class Bootstrap {
             param = new Object[1];
             param[0] = arguments;
         }
+        //调用Cataline的方法
         Method method = catalinaDaemon.getClass().getMethod(methodName, paramTypes);
         log.info("Calling startup class " + method);
         method.invoke(catalinaDaemon, param);
@@ -270,8 +272,7 @@ public final class Bootstrap {
     private Object getServer() throws Exception {
 
         String methodName = "getServer";
-        Method method =
-            catalinaDaemon.getClass().getMethod(methodName);
+        Method method = catalinaDaemon.getClass().getMethod(methodName);
         return method.invoke(catalinaDaemon);
 
     }

@@ -43,6 +43,9 @@ import org.apache.catalina.Globals;
 import org.apache.catalina.security.SecurityUtil;
 import org.apache.coyote.http11.upgrade.UpgradeInbound;
 import org.apache.coyote.http11.upgrade.servlet31.HttpUpgradeHandler;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.net.JIoEndpoint;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -56,6 +59,7 @@ import org.apache.tomcat.util.res.StringManager;
 @SuppressWarnings("deprecation")
 public class RequestFacade implements HttpServletRequest {
 
+    private static final Log log = LogFactory.getLog(RequestFacade.class);
 
     // ----------------------------------------------------------- DoPrivileged
 
@@ -360,7 +364,7 @@ public class RequestFacade implements HttpServletRequest {
 
     @Override
     public String getParameter(String name) {
-
+        log.info("getParameter  ======"+name);
         if (request == null) {
             throw new IllegalStateException(sm.getString("requestFacade.nullRequest"));
         }
@@ -375,7 +379,7 @@ public class RequestFacade implements HttpServletRequest {
 
     @Override
     public Enumeration<String> getParameterNames() {
-
+        log.info("getParameterNames");
         if (request == null) {
             throw new IllegalStateException(
                             sm.getString("requestFacade.nullRequest"));
